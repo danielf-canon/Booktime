@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
 import com.example.booktime.tadeo.views.LoadingScreen
+import com.example.booktime.tadeo.views.LoginScreen
 import com.example.booktime.tadeo.views.MainMenu
 import com.example.booktime.tadeo.views.RegisterScreen
 import kotlinx.coroutines.delay
@@ -49,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     AnimatedContent(
                         targetState = currentScreen,
                         transitionSpec = {
-                            if (targetState == "register" || (initialState == "loading" && targetState == "main")) {
+                            if (targetState == "register" || targetState == "login" || (initialState == "loading" && targetState == "main")) {
                                 // Pure slide in from right to left (forward)
                                 slideInHorizontally(animationSpec = tween(400)) { it }
                                     .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { -it / 2 })
@@ -64,9 +65,13 @@ class MainActivity : ComponentActivity() {
                         when (screen) {
                             "loading" -> LoadingScreen()
                             "main" -> MainMenu(
+                                onLoginClick = { currentScreen = "login" },
                                 onRegisterClick = { currentScreen = "register" }
                             )
                             "register" -> RegisterScreen(
+                                onBackClick = { currentScreen = "main" }
+                            )
+                            "login" -> LoginScreen(
                                 onBackClick = { currentScreen = "main" }
                             )
                         }

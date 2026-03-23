@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.booktime.tadeo.R
 
 @Composable
-fun MainMenu(onRegisterClick: () -> Unit) {
+fun MainMenu(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,7 +45,7 @@ fun MainMenu(onRegisterClick: () -> Unit) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Button(
-                onClick = { /* Handle Login */ },
+                onClick = onLoginClick,
                 modifier = Modifier
                     .width(280.dp)
                     .height(56.dp),
