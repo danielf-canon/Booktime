@@ -13,11 +13,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-
 import androidx.compose.foundation.layout.size
-
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -41,6 +39,13 @@ import androidx.compose.ui.unit.dp
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
 import kotlinx.coroutines.delay
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -48,17 +53,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BooktimeTheme {
-                var isLoading by remember { mutableStateOf(true) }
+                var currentScreen by remember { mutableStateOf("loading") }
                 
                 LaunchedEffect(Unit) {
                     delay(3000) // Simulating loading for 3 seconds
-                    isLoading = false
+                    currentScreen = "main"
                 }
                 
-                if (isLoading) {
-                    LoadingScreen()
-                } else {
-                    MainMenu()
+                when (currentScreen) {
+                    "loading" -> LoadingScreen()
+                    "main" -> MainMenu(
+                        onRegisterClick = { currentScreen = "register" }
+                    )
+                    "register" -> RegisterScreen(
+                        onBackClick = { currentScreen = "main" }
+                    )
                 }
             }
         }
@@ -94,7 +103,7 @@ fun LoadingScreen() {
 }
 
 @Composable
-fun MainMenu() {
+fun MainMenu(onRegisterClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -134,7 +143,7 @@ fun MainMenu() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* Handle Signup */ },
+                onClick = onRegisterClick,
                 modifier = Modifier
                     .width(280.dp)
                     .height(56.dp),
@@ -153,10 +162,139 @@ fun MainMenu() {
     }
 }
 
+@Composable
+fun RegisterScreen(onBackClick: () -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF4A5A6E))
+    ) {
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier
+                .padding(top = 48.dp, start = 16.dp)
+                .align(Alignment.TopStart)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+        ) {
+            Text(
+                text = "Crear Cuenta",
+                style = MaterialTheme.typography.headlineLarge,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                placeholder = { Text("Nombre completo") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFD9D9D9),
+                    unfocusedContainerColor = Color(0xFFD9D9D9),
+                    focusedIndicatorColor = Color(0xFF54C35D),
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedPlaceholderColor = Color.Gray,
+                    unfocusedPlaceholderColor = Color.Gray
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                placeholder = { Text("Correo electrónico") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFD9D9D9),
+                    unfocusedContainerColor = Color(0xFFD9D9D9),
+                    focusedIndicatorColor = Color(0xFF54C35D),
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedPlaceholderColor = Color.Gray,
+                    unfocusedPlaceholderColor = Color.Gray
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                placeholder = { Text("Contraseña") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFD9D9D9),
+                    unfocusedContainerColor = Color(0xFFD9D9D9),
+                    focusedIndicatorColor = Color(0xFF54C35D),
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedPlaceholderColor = Color.Gray,
+                    unfocusedPlaceholderColor = Color.Gray
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+
+            Button(
+                onClick = { /* Handle actual registration */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF54C35D),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "Registrarse",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun MainMenuPreview() {
     BooktimeTheme {
-        MainMenu()
+        MainMenu(onRegisterClick = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    BooktimeTheme {
+        RegisterScreen(onBackClick = {})
     }
 }
