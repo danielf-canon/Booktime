@@ -3,6 +3,7 @@ package com.example.booktime.tadeo.views
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,9 +32,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onBackClick: () -> Unit) {
+fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { 
+                Text(
+                    text = "Campos incompletos",
+                    style = MaterialTheme.typography.titleLarge
+                ) 
+            },
+            text = { 
+                Text(
+                    text = "Por favor, ingresa tu correo y contraseña para entrar.",
+                    style = MaterialTheme.typography.bodyMedium
+                ) 
+            },
+            confirmButton = {
+                TextButton(onClick = { showErrorDialog = false }) {
+                    Text(
+                        text = "Entendido",
+                        color = Color(0xFF54C35D)
+                    )
+                }
+            },
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            textContentColor = Color.Black
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -92,7 +125,7 @@ fun LoginScreen(onBackClick: () -> Unit) {
                 placeholder = { Text("Contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
+                    .padding(bottom = 8.dp),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFFD9D9D9),
@@ -107,8 +140,27 @@ fun LoginScreen(onBackClick: () -> Unit) {
                 shape = RoundedCornerShape(8.dp)
             )
 
+            TextButton(
+                onClick = onForgotPasswordClick,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = "Olvidé mi contraseña",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Button(
-                onClick = { /* Handle actual login */ },
+                onClick = { 
+                    if (email.isBlank() || password.isBlank()) {
+                        showErrorDialog = true
+                    } else {
+                        /* Handle actual login */ 
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

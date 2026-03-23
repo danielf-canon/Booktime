@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
+import com.example.booktime.tadeo.views.ForgotPasswordScreen
 import com.example.booktime.tadeo.views.LoadingScreen
 import com.example.booktime.tadeo.views.LoginScreen
 import com.example.booktime.tadeo.views.MainMenu
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     AnimatedContent(
                         targetState = currentScreen,
                         transitionSpec = {
-                            if (targetState == "register" || targetState == "login" || (initialState == "loading" && targetState == "main")) {
+                            if (targetState == "register" || targetState == "login" || targetState == "forgot_password" || (initialState == "loading" && targetState == "main")) {
                                 // Pure slide in from right to left (forward)
                                 slideInHorizontally(animationSpec = tween(400)) { it }
                                     .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { -it / 2 })
@@ -72,7 +73,11 @@ class MainActivity : ComponentActivity() {
                                 onBackClick = { currentScreen = "main" }
                             )
                             "login" -> LoginScreen(
-                                onBackClick = { currentScreen = "main" }
+                                onBackClick = { currentScreen = "main" },
+                                onForgotPasswordClick = { currentScreen = "forgot_password" }
+                            )
+                            "forgot_password" -> ForgotPasswordScreen(
+                                onBackClick = { currentScreen = "login" }
                             )
                         }
                     }

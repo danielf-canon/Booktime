@@ -17,6 +17,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +35,37 @@ fun RegisterScreen(onBackClick: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { 
+                Text(
+                    text = "Campos incompletos",
+                    style = MaterialTheme.typography.titleLarge
+                ) 
+            },
+            text = { 
+                Text(
+                    text = "Por favor, completa todos los espacios para continuar.",
+                    style = MaterialTheme.typography.bodyMedium
+                ) 
+            },
+            confirmButton = {
+                TextButton(onClick = { showErrorDialog = false }) {
+                    Text(
+                        text = "Entendido",
+                        color = Color(0xFF54C35D)
+                    )
+                }
+            },
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            textContentColor = Color.Black
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -114,6 +147,27 @@ fun RegisterScreen(onBackClick: () -> Unit) {
                 placeholder = { Text("Contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFD9D9D9),
+                    unfocusedContainerColor = Color(0xFFD9D9D9),
+                    focusedIndicatorColor = Color(0xFF54C35D),
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedPlaceholderColor = Color.Gray,
+                    unfocusedPlaceholderColor = Color.Gray
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                placeholder = { Text("Confirmar contraseña") },
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 32.dp),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 colors = TextFieldDefaults.colors(
@@ -130,7 +184,13 @@ fun RegisterScreen(onBackClick: () -> Unit) {
             )
 
             Button(
-                onClick = { /* Handle actual registration */ },
+                onClick = { 
+                    if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                        showErrorDialog = true
+                    } else {
+                        /* Handle actual registration */ 
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
