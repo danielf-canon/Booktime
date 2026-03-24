@@ -13,9 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit) {
-    var email by remember { mutableStateOf("") }
-    var code by remember { mutableStateOf("") }
+fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Unit) {
+    var newPassword by remember { mutableStateOf("") }
+    var confirmNewPassword by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -24,7 +24,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
             onDismissRequest = { showErrorDialog = false },
             title = { 
                 Text(
-                    text = "Campos incompletos",
+                    text = "Error",
                     style = MaterialTheme.typography.titleLarge
                 ) 
             },
@@ -74,16 +74,16 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Recuperar Contraseña",
+                text = "Nueva Contraseña",
                 style = MaterialTheme.typography.headlineLarge,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                placeholder = { Text("Correo electrónico") },
+                value = newPassword,
+                onValueChange = { newPassword = it },
+                placeholder = { Text("Nueva contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -102,9 +102,9 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
             )
 
             OutlinedTextField(
-                value = code,
-                onValueChange = { code = it },
-                placeholder = { Text("Código de verificación") },
+                value = confirmNewPassword,
+                onValueChange = { confirmNewPassword = it },
+                placeholder = { Text("Confirmar nueva contraseña") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 32.dp),
@@ -124,11 +124,14 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
 
             Button(
                 onClick = { 
-                    if (email.isBlank()) {
-                        errorMessage = "Por favor, ingresa tu correo para solicitar el código."
+                    if (newPassword.isBlank() || confirmNewPassword.isBlank()) {
+                        errorMessage = "Por favor, completa ambos campos."
+                        showErrorDialog = true
+                    } else if (newPassword != confirmNewPassword) {
+                        errorMessage = "Las contraseñas no coinciden."
                         showErrorDialog = true
                     } else {
-                        /* Handle code request */ 
+                        onPasswordCreated()
                     }
                 },
                 modifier = Modifier
@@ -141,36 +144,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Solicitar Código",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { 
-                    if (code.isBlank()) {
-                        errorMessage = "Por favor, ingresa el código de verificación."
-                        showErrorDialog = true
-                    } else if (!code.all { it.isDigit() }) {
-                        errorMessage = "El código debe contener solo números."
-                        showErrorDialog = true
-                    } else {
-                        onConfirmCodeClick()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF54C35D),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Confirmar Código",
+                    text = "Cambiar Contraseña",
                     style = MaterialTheme.typography.titleLarge
                 )
             }
