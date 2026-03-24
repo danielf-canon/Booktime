@@ -63,7 +63,7 @@ fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Un
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = { newPassword = it },
-                placeholder = { Text("Nueva contraseña") },
+                placeholder = { Text("Nueva contraseña", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -85,7 +85,7 @@ fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Un
             OutlinedTextField(
                 value = confirmNewPassword,
                 onValueChange = { confirmNewPassword = it },
-                placeholder = { Text("Confirmar nueva contraseña") },
+                placeholder = { Text("Confirmar nueva contraseña", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 32.dp),

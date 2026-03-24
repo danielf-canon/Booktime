@@ -62,7 +62,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Correo electrónico") },
+                placeholder = { Text("Correo electrónico", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -83,7 +83,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
             OutlinedTextField(
                 value = code,
                 onValueChange = { code = it },
-                placeholder = { Text("Código de verificación") },
+                placeholder = { Text("Código de verificación", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 32.dp),

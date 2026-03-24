@@ -63,7 +63,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Correo electrónico") },
+                placeholder = { Text("Correo electrónico", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -84,7 +84,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = { Text("Contraseña") },
+                placeholder = { Text("Contraseña", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
