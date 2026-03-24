@@ -20,11 +20,12 @@ fun RegisterScreen(onBackClick: () -> Unit) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     if (showErrorDialog) {
         AnimatedDialog(
-            title = "Campos incompletos",
-            text = "Por favor, completa todos los espacios para continuar.",
+            title = "Error de validación",
+            text = errorMessage,
             onDismiss = { showErrorDialog = false }
         )
     }
@@ -150,6 +151,13 @@ fun RegisterScreen(onBackClick: () -> Unit) {
             Button(
                 onClick = { 
                     if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                        errorMessage = "Por favor, completa todos los espacios para continuar."
+                        showErrorDialog = true
+                    } else if (password.length < 8 || password.length > 16) {
+                        errorMessage = "La contraseña debe tener entre 8 y 16 caracteres."
+                        showErrorDialog = true
+                    } else if (password != confirmPassword) {
+                        errorMessage = "Las contraseñas no coinciden."
                         showErrorDialog = true
                     } else {
                         /* Handle actual registration */ 

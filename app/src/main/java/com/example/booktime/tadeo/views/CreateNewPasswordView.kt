@@ -109,6 +109,9 @@ fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Un
                     if (newPassword.isBlank() || confirmNewPassword.isBlank()) {
                         errorMessage = "Por favor, completa ambos campos."
                         showErrorDialog = true
+                    } else if (newPassword.length < 8 || newPassword.length > 16) {
+                        errorMessage = "La contraseña debe tener entre 8 y 16 caracteres."
+                        showErrorDialog = true
                     } else if (newPassword != confirmNewPassword) {
                         errorMessage = "Las contraseñas no coinciden."
                         showErrorDialog = true

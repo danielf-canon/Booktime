@@ -135,6 +135,9 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
                     } else if (!code.all { it.isDigit() }) {
                         errorMessage = "El código debe contener solo números."
                         showErrorDialog = true
+                    } else if (code.length > 6) {
+                        errorMessage = "El código no puede tener más de 6 caracteres."
+                        showErrorDialog = true
                     } else {
                         onConfirmCodeClick()
                     }

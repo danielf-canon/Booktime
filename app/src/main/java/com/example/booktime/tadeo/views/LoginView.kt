@@ -14,15 +14,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit) {
+fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLoginSuccess: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     if (showErrorDialog) {
         AnimatedDialog(
-            title = "Campos incompletos",
-            text = "Por favor, ingresa tu correo y contraseña para entrar.",
+            title = "Error de validación",
+            text = errorMessage,
             onDismiss = { showErrorDialog = false }
         )
     }
@@ -118,9 +119,13 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit) {
             Button(
                 onClick = { 
                     if (email.isBlank() || password.isBlank()) {
+                        errorMessage = "Por favor, ingresa tu correo y contraseña para entrar."
+                        showErrorDialog = true
+                    } else if (password.length < 8 || password.length > 16) {
+                        errorMessage = "La contraseña debe tener entre 8 y 16 caracteres."
                         showErrorDialog = true
                     } else {
-                        /* Handle actual login */ 
+                        onLoginSuccess()
                     }
                 },
                 modifier = Modifier

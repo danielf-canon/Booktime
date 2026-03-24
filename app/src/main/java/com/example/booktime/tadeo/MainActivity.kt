@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
+import com.example.booktime.tadeo.views.ComingSoonScreen
 import com.example.booktime.tadeo.views.CreateNewPasswordScreen
 import com.example.booktime.tadeo.views.ForgotPasswordScreen
 import com.example.booktime.tadeo.views.LoadingScreen
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     AnimatedContent(
                         targetState = currentScreen,
                         transitionSpec = {
-                            if (targetState == "register" || targetState == "login" || targetState == "forgot_password" || targetState == "create_new_password" || (initialState == "loading" && targetState == "main")) {
+                            if (targetState == "register" || targetState == "login" || targetState == "forgot_password" || targetState == "create_new_password" || targetState == "coming_soon" || (initialState == "loading" && targetState == "main")) {
                                 // Pure slide in from right to left (forward)
                                 slideInHorizontally(animationSpec = tween(400)) { it }
                                     .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { -it / 2 })
@@ -75,7 +76,8 @@ class MainActivity : ComponentActivity() {
                             )
                             "login" -> LoginScreen(
                                 onBackClick = { currentScreen = "main" },
-                                onForgotPasswordClick = { currentScreen = "forgot_password" }
+                                onForgotPasswordClick = { currentScreen = "forgot_password" },
+                                onLoginSuccess = { currentScreen = "coming_soon" }
                             )
                             "forgot_password" -> ForgotPasswordScreen(
                                 onBackClick = { currentScreen = "login" },
@@ -84,6 +86,9 @@ class MainActivity : ComponentActivity() {
                             "create_new_password" -> CreateNewPasswordScreen(
                                 onBackClick = { currentScreen = "forgot_password" },
                                 onPasswordCreated = { currentScreen = "login" }
+                            )
+                            "coming_soon" -> ComingSoonScreen(
+                                onBackClick = { currentScreen = "main" }
                             )
                         }
                     }
