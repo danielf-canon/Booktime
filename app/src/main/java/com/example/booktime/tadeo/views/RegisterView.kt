@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RegisterScreen(onBackClick: () -> Unit) {
+fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -160,7 +160,7 @@ fun RegisterScreen(onBackClick: () -> Unit) {
                         errorMessage = "Las contraseñas no coinciden."
                         showErrorDialog = true
                     } else {
-                        /* Handle actual registration */ 
+                        onRegisterSuccess()
                     }
                 },
                 modifier = Modifier

@@ -28,6 +28,8 @@ import com.example.booktime.tadeo.views.ForgotPasswordScreen
 import com.example.booktime.tadeo.views.LoadingScreen
 import com.example.booktime.tadeo.views.LoginScreen
 import com.example.booktime.tadeo.views.MainMenu
+import com.example.booktime.tadeo.views.OnboardingTimeScreen
+import com.example.booktime.tadeo.views.OnboardingGenreScreen
 import com.example.booktime.tadeo.views.RegisterScreen
 import kotlinx.coroutines.delay
 
@@ -53,7 +55,7 @@ class MainActivity : ComponentActivity() {
                     AnimatedContent(
                         targetState = currentScreen,
                         transitionSpec = {
-                            if (targetState == "register" || targetState == "login" || targetState == "forgot_password" || targetState == "create_new_password" || targetState == "coming_soon" || (initialState == "loading" && targetState == "main")) {
+                            if (targetState == "register" || targetState == "login" || targetState == "forgot_password" || targetState == "create_new_password" || targetState == "coming_soon" || targetState == "onboarding_time" || targetState == "onboarding_genre" || (initialState == "loading" && targetState == "main")) {
                                 // Pure slide in from right to left (forward)
                                 slideInHorizontally(animationSpec = tween(400)) { it }
                                     .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { -it / 2 })
@@ -72,7 +74,14 @@ class MainActivity : ComponentActivity() {
                                 onRegisterClick = { currentScreen = "register" }
                             )
                             "register" -> RegisterScreen(
-                                onBackClick = { currentScreen = "main" }
+                                onBackClick = { currentScreen = "main" },
+                                onRegisterSuccess = { currentScreen = "onboarding_time" }
+                            )
+                            "onboarding_time" -> OnboardingTimeScreen(
+                                onNext = { currentScreen = "onboarding_genre" }
+                            )
+                            "onboarding_genre" -> OnboardingGenreScreen(
+                                onFinish = { currentScreen = "coming_soon" }
                             )
                             "login" -> LoginScreen(
                                 onBackClick = { currentScreen = "main" },
