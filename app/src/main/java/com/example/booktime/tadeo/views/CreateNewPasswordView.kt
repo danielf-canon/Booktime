@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -20,31 +21,10 @@ fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Un
     var errorMessage by remember { mutableStateOf("") }
 
     if (showErrorDialog) {
-        AlertDialog(
-            onDismissRequest = { showErrorDialog = false },
-            title = { 
-                Text(
-                    text = "Error",
-                    style = MaterialTheme.typography.titleLarge
-                ) 
-            },
-            text = { 
-                Text(
-                    text = errorMessage,
-                    style = MaterialTheme.typography.bodyMedium
-                ) 
-            },
-            confirmButton = {
-                TextButton(onClick = { showErrorDialog = false }) {
-                    Text(
-                        text = "Entendido",
-                        color = Color(0xFF54C35D)
-                    )
-                }
-            },
-            containerColor = Color.White,
-            titleContentColor = Color.Black,
-            textContentColor = Color.Black
+        AnimatedDialog(
+            title = "Error",
+            text = errorMessage,
+            onDismiss = { showErrorDialog = false }
         )
     }
 
@@ -88,6 +68,7 @@ fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Un
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 textStyle = MaterialTheme.typography.bodyLarge,
+                visualTransformation = PasswordVisualTransformation(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFFD9D9D9),
                     unfocusedContainerColor = Color(0xFFD9D9D9),
@@ -109,6 +90,7 @@ fun CreateNewPasswordScreen(onBackClick: () -> Unit, onPasswordCreated: () -> Un
                     .fillMaxWidth()
                     .padding(bottom = 32.dp),
                 textStyle = MaterialTheme.typography.bodyLarge,
+                visualTransformation = PasswordVisualTransformation(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFFD9D9D9),
                     unfocusedContainerColor = Color(0xFFD9D9D9),

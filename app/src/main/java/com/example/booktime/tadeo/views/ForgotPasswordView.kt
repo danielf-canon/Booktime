@@ -20,31 +20,10 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
     var errorMessage by remember { mutableStateOf("") }
 
     if (showErrorDialog) {
-        AlertDialog(
-            onDismissRequest = { showErrorDialog = false },
-            title = { 
-                Text(
-                    text = "Campos incompletos",
-                    style = MaterialTheme.typography.titleLarge
-                ) 
-            },
-            text = { 
-                Text(
-                    text = errorMessage,
-                    style = MaterialTheme.typography.bodyMedium
-                ) 
-            },
-            confirmButton = {
-                TextButton(onClick = { showErrorDialog = false }) {
-                    Text(
-                        text = "Entendido",
-                        color = Color(0xFF54C35D)
-                    )
-                }
-            },
-            containerColor = Color.White,
-            titleContentColor = Color.Black,
-            textContentColor = Color.Black
+        AnimatedDialog(
+            title = "Campos incompletos",
+            text = errorMessage,
+            onDismiss = { showErrorDialog = false }
         )
     }
 
