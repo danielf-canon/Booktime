@@ -12,15 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-
+import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
+    val auth = FirebaseAuth.getInstance()
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     if (showErrorDialog) {
         AnimatedDialog(
@@ -149,7 +152,8 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
             )
 
             Button(
-                onClick = { 
+                onClick = {
+                    if (isLoading) return@Button
                     if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
                         errorMessage = "Por favor, completa todos los espacios para continuar."
                         showErrorDialog = true
@@ -160,22 +164,60 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
                         errorMessage = "Las contraseñas no coinciden."
                         showErrorDialog = true
                     } else {
-                        onRegisterSuccess()
+                        isLoading = true
+
+                        auth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                isLoading = false
+                                if (task.isSuccessful) {
+
+                                    val user = auth.currentUser
+                                    val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                                        .setDisplayName(name)
+                                        .build()
+
+                                    user?.updateProfile(profileUpdates)
+
+                                    onRegisterSuccess()
+
+                                } else {
+                                    val exception = task.exception
+
+                                    errorMessage = when (exception) {
+                                        is com.google.firebase.auth.FirebaseAuthUserCollisionException ->
+                                            "Este correo ya está registrado."
+                                        is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException ->
+                                            "Correo inválido."
+                                        else -> "Error al registrar usuario"
+                                    }
+                                    showErrorDialog = true
+                                }
+                            }
                     }
                 },
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF54C35D),
                     contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Registrarse",
-                    style = MaterialTheme.typography.titleLarge
                 )
+            ) {
+
+                // 👇 ESTE ES EL CAMBIO VISUAL
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Registrarse",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
             }
         }
     }

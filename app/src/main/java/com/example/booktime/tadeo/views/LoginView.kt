@@ -12,13 +12,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 @Composable
 fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLoginSuccess: () -> Unit) {
+    val auth = FirebaseAuth.getInstance()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
 
     if (showErrorDialog) {
         AnimatedDialog(
@@ -117,30 +123,61 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { 
+                onClick = {
+                    if (isLoading) return@Button
+
                     if (email.isBlank() || password.isBlank()) {
-                        errorMessage = "Por favor, ingresa tu correo y contraseña para entrar."
+                        errorMessage = "Ingresa correo y contraseña."
                         showErrorDialog = true
-                    } else if (password.length < 8 || password.length > 16) {
-                        errorMessage = "La contraseña debe tener entre 8 y 16 caracteres."
-                        showErrorDialog = true
+
                     } else {
-                        onLoginSuccess()
+                        isLoading = true
+
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                isLoading = false
+
+                                if (task.isSuccessful) {
+                                    onLoginSuccess()
+
+                                } else {
+                                    val exception = task.exception
+
+                                    errorMessage = when (exception) {
+                                        is FirebaseAuthInvalidUserException ->
+                                            "El usuario no existe."
+                                        is FirebaseAuthInvalidCredentialsException ->
+                                            "Contraseña incorrecta."
+                                        else -> "Error al iniciar sesión"
+                                    }
+
+                                    showErrorDialog = true
+                                }
+                            }
                     }
                 },
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF54C35D),
                     contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Entrar",
-                    style = MaterialTheme.typography.titleLarge
                 )
+            ) {
+
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Entrar",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
             }
         }
     }

@@ -13,3 +13,16 @@
 .externalNativeBuild
 .cxx
 local.properties
+google-services.json
+*.apk
+*.aab
+Thumbs.db
+*.log
+*.class
+*/build/
+*.tmp
+*.bak
+*.swp
+*.keystore
+
+#Keystore aún no está pero nos va a servir más adelante
