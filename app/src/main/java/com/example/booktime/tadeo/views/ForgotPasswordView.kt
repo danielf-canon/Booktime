@@ -11,9 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit) {
+    val auth = FirebaseAuth.getInstance()
+    var isLoading by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -80,34 +85,25 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
                 shape = RoundedCornerShape(8.dp)
             )
 
-            OutlinedTextField(
-                value = code,
-                onValueChange = { code = it },
-                placeholder = { Text("Código de verificación", style = MaterialTheme.typography.bodyLarge) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFD9D9D9),
-                    unfocusedContainerColor = Color(0xFFD9D9D9),
-                    focusedIndicatorColor = Color(0xFF54C35D),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
-
             Button(
-                onClick = { 
+                onClick = {
                     if (email.isBlank()) {
-                        errorMessage = "Por favor, ingresa tu correo para solicitar el código."
+                        errorMessage = "Ingresa tu correo."
                         showErrorDialog = true
                     } else {
-                        /* Handle code request */ 
+                        isLoading = true
+
+                        auth.sendPasswordResetEmail(email)
+                            .addOnCompleteListener { task ->
+                                isLoading = false
+
+                                if (task.isSuccessful) {
+                                    successMessage = "Si el correo está registrado, recibirás un email para restablecer tu contraseña."
+                                } else {
+                                    errorMessage = "Error al enviar correo."
+                                    showErrorDialog = true
+                                }
+                            }
                     }
                 },
                 modifier = Modifier
@@ -118,42 +114,30 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Solicitar Código",
-                    style = MaterialTheme.typography.titleLarge
-                )
+            )
+
+            {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Enviar correo")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = { 
-                    if (code.isBlank()) {
-                        errorMessage = "Por favor, ingresa el código de verificación."
-                        showErrorDialog = true
-                    } else if (!code.all { it.isDigit() }) {
-                        errorMessage = "El código debe contener solo números."
-                        showErrorDialog = true
-                    } else if (code.length > 6) {
-                        errorMessage = "El código no puede tener más de 6 caracteres."
-                        showErrorDialog = true
-                    } else {
-                        onConfirmCodeClick()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF54C35D),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
+            if (successMessage.isNotEmpty()) {
                 Text(
-                    text = "Confirmar Código",
-                    style = MaterialTheme.typography.titleLarge
+                    text = successMessage,
+                    color = Color.Green,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    textAlign = TextAlign.Center
                 )
             }
         }
