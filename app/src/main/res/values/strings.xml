@@ -1,3 +1,91 @@
 <resources>
-    <string name="app_name">Booktime</string>
+    <string name="app_name">Booktimetadeo</string>
+
+    <!-- General -->
+    <string name="back">Volver</string>
+    <string name="continue_text">Continuar</string>
+    <string name="finish">Finalizar</string>
+    <string name="save_changes">Guardar Cambios</string>
+    <string name="cancel">Cancelar</string>
+    <string name="error_title">Error de validación</string>
+    <string name="security_error_title">Error de Seguridad</string>
+    <string name="loading">Cargando&#8230;</string>
+
+    <!-- Login -->
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="email_placeholder">Correo electrónico</string>
+    <string name="password_placeholder">Contraseña</string>
+    <string name="forgot_password_link">Olvidé mi contraseña</string>
+    <string name="login_button">Entrar</string>
+    <string name="error_empty_fields">Por favor, completa todos los campos para continuar.</string>
+    <string name="error_invalid_email">Ingresa un correo válido.</string>
+
+    <!-- Register -->
+    <string name="register_title">Crear Cuenta</string>
+    <string name="full_name_placeholder">Nombre completo</string>
+    <string name="confirm_password_placeholder">Confirmar contraseña</string>
+    <string name="register_button">Registrarse</string>
+    <string name="error_password_rules">La contraseña debe tener entre 8 y 16 caracteres y al menos un número.</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden.</string>
+    <string name="error_email_empty">Por favor, ingresa tu correo.</string>
+
+    <!-- Forgot Password -->
+    <string name="recovery_title">Recuperar Contraseña</string>
+    <string name="send_email_button">Enviar correo</string>
+    <string name="recovery_success_msg">Si el correo está registrado, recibirás un email para restablecer tu contraseña.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configuración</string>
+    <string name="my_account_section">Mi Cuenta</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="edit_profile_subtitle">Nombre y correo</string>
+    <string name="privacy_security">Privacidad y Seguridad</string>
+    <string name="privacy_security_subtitle">Cambiar contraseña y biometría</string>
+    <string name="reading_prefs_section">Preferencias de Lectura</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="reading_style">Estilo de Lectura</string>
+    <string name="reading_style_subtitle">Ajusta el tamaño de letra y visualización</string>
+    <string name="library_storage_section">Biblioteca y Almacenamiento</string>
+    <string name="clear_cache">Limpiar Caché</string>
+    <string name="clear_cache_subtitle">Libera espacio eliminando datos temporales</string>
+    <string name="download_location">Ubicación de Descarga</string>
+    <string name="download_location_subtitle">Almacenamiento interno o tarjeta SD</string>
+    <string name="notifications_section">Notificaciones</string>
+    <string name="reading_reminders">Recordatorios de Lectura</string>
+    <string name="logout_button">Cerrar Sesión</string>
+
+    <!-- Edit Profile -->
+    <string name="personal_info_section">Información Personal</string>
+
+    <!-- Change Password -->
+    <string name="security_section">Seguridad</string>
+    <string name="change_password_title">Cambiar Contraseña</string>
+    <string name="security_tip">Asegúrate de usar una contraseña segura para proteger tu cuenta.</string>
+    <string name="current_password_placeholder">Contraseña Actual</string>
+    <string name="new_password_placeholder">Nueva Contraseña</string>
+    <string name="confirm_new_password_placeholder">Confirmar Nueva Contraseña</string>
+    <string name="show_passwords">Mostrar contraseñas</string>
+    <string name="update_password_button">Actualizar Contraseña</string>
+    <string name="error_same_password">La nueva contraseña no puede ser igual a la actual.</string>
+
+    <!-- Reading Settings -->
+    <string name="reading_settings_title">Ajustes de Lectura</string>
+    <string name="preview_text">Así se verá el texto de tus libros con esta configuración.</string>
+    <string name="font_size_label">Tamaño de Fuente: %1$dsp</string>
+    <string name="apply_changes">Aplicar Cambios</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_time_question">¿Cuánto tiempo quieres leer?</string>
+    <string name="onboarding_genre_question">¿Qué géneros literarios te gustan?</string>
+
+    <!-- Books -->
+    <string name="my_books_title">Mis Libros</string>
+    <string name="digital_library">Biblioteca Digital</string>
+    <string name="favorites">Favoritos</string>
+    <string name="main_menu_label">Menú Principal</string>
+    <string name="options_label">Opciones</string>
+    <string name="add_pdf_label">Añadir PDF</string>
+    <string name="login_menu_button">Iniciar sesión</string>
+    <string name="register_menu_button">Registrarse</string>
+    <string name="app_version">Versión 1.0.0 (Beta)</string>
 </resources>

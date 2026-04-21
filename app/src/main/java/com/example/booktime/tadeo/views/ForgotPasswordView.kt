@@ -1,145 +1,93 @@
 package com.example.booktime.tadeo.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.example.booktime.tadeo.R
+import com.example.booktime.tadeo.components.BooktimeButton
+import com.example.booktime.tadeo.components.BooktimeTextField
+import com.example.booktime.tadeo.components.ScreenWrapper
+import com.example.booktime.tadeo.utils.ValidationUtils
 
 @Composable
-fun ForgotPasswordScreen(onBackClick: () -> Unit, onConfirmCodeClick: () -> Unit) {
+fun ForgotPasswordScreen(onBackClick: () -> Unit) {
     val auth = FirebaseAuth.getInstance()
     var isLoading by remember { mutableStateOf(false) }
     var successMessage by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var code by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
+    val errorInvalidEmail = stringResource(id = R.string.error_invalid_email)
+    val recoverySuccessMsg = stringResource(id = R.string.recovery_success_msg)
+    val errorEmailEmpty = stringResource(id = R.string.error_email_empty)
+    val sendEmailButtonText = stringResource(id = R.string.send_email_button)
+
     if (showErrorDialog) {
         AnimatedDialog(
-            title = "Campos incompletos",
+            title = stringResource(id = R.string.error_title),
             text = errorMessage,
             onDismiss = { showErrorDialog = false }
         )
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF4A5A6E))
-    ) {
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier
-                .padding(top = 48.dp, start = 16.dp)
-                .align(Alignment.TopStart)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White
-            )
-        }
+    ScreenWrapper(onBackClick = onBackClick) {
+        Text(
+            text = stringResource(id = R.string.recovery_title),
+            style = MaterialTheme.typography.headlineLarge,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Recuperar Contraseña",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
+        BooktimeTextField(
+            value = email,
+            onValueChange = { email = it },
+            placeholder = stringResource(id = R.string.email_placeholder),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                placeholder = { Text("Correo electrónico", style = MaterialTheme.typography.bodyLarge) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFD9D9D9),
-                    unfocusedContainerColor = Color(0xFFD9D9D9),
-                    focusedIndicatorColor = Color(0xFF54C35D),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
-
-            Button(
-                onClick = {
-                    if (email.isBlank()) {
-                        errorMessage = "Ingresa tu correo."
-                        showErrorDialog = true
-                    } else {
-                        isLoading = true
-
-                        auth.sendPasswordResetEmail(email)
-                            .addOnCompleteListener { task ->
-                                isLoading = false
-
-                                if (task.isSuccessful) {
-                                    successMessage = "Si el correo está registrado, recibirás un email para restablecer tu contraseña."
-                                } else {
-                                    errorMessage = "Error al enviar correo."
-                                    showErrorDialog = true
-                                }
-                            }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF54C35D),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
+        BooktimeButton(
+            text = sendEmailButtonText,
+            isLoading = isLoading,
+            onClick = {
+                if (email.isBlank()) {
+                    errorMessage = errorEmailEmpty
+                    showErrorDialog = true
+                } else if (!ValidationUtils.isValidEmail(email)) {
+                    errorMessage = errorInvalidEmail
+                    showErrorDialog = true
                 } else {
-                    Text("Enviar correo")
+                    isLoading = true
+                    auth.sendPasswordResetEmail(email)
+                        .addOnCompleteListener { task ->
+                            isLoading = false
+                            if (task.isSuccessful) {
+                                successMessage = recoverySuccessMsg
+                            } else {
+                                errorMessage = "Error al enviar correo: ${task.exception?.message}"
+                                showErrorDialog = true
+                            }
+                        }
                 }
             }
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (successMessage.isNotEmpty()) {
-                Text(
-                    text = successMessage,
-                    color = Color.Green,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
+        if (successMessage.isNotEmpty()) {
+            Text(
+                text = successMessage,
+                color = Color.Green,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

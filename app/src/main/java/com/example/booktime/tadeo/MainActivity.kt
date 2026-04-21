@@ -22,16 +22,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
-import com.example.booktime.tadeo.views.ComingSoonScreen
-import com.example.booktime.tadeo.views.CreateNewPasswordScreen
-import com.example.booktime.tadeo.views.ForgotPasswordScreen
-import com.example.booktime.tadeo.views.LoadingScreen
-import com.example.booktime.tadeo.views.LoginScreen
-import com.example.booktime.tadeo.views.MainMenu
-import com.example.booktime.tadeo.views.OnboardingTimeScreen
-import com.example.booktime.tadeo.views.OnboardingGenreScreen
-import com.example.booktime.tadeo.views.RegisterScreen
+import com.example.booktime.tadeo.navigation.Screen
+import com.example.booktime.tadeo.views.*
 import kotlinx.coroutines.delay
+
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,64 +36,88 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BooktimeTheme {
-                var currentScreen by remember { mutableStateOf("loading") }
+                val auth = FirebaseAuth.getInstance()
+                
+                var currentScreen by remember { mutableStateOf(Screen.Loading.route) }
                 
                 LaunchedEffect(Unit) {
-                    delay(3000) // Simulating loading for 3 seconds
-                    currentScreen = "main"
+                    delay(3000) // Simulacion de carga
+                    currentScreen = if (auth.currentUser != null) {
+                        Screen.Books.route
+                    } else {
+                        Screen.Main.route
+                    }
                 }
                 
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFF4A5A6E)) // PrincipalMenu background for the whole app
+                        .background(Color(0xFF4A5A6E))
                 ) {
                     AnimatedContent(
                         targetState = currentScreen,
                         transitionSpec = {
-                            if (targetState == "register" || targetState == "login" || targetState == "forgot_password" || targetState == "create_new_password" || targetState == "coming_soon" || targetState == "onboarding_time" || targetState == "onboarding_genre" || (initialState == "loading" && targetState == "main")) {
-                                // Pure slide in from right to left (forward)
+                            if (Screen.isForward(targetState) || (initialState == Screen.Loading.route && targetState == Screen.Main.route)) {
                                 slideInHorizontally(animationSpec = tween(400)) { it }
                                     .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { -it / 2 })
                             } else {
-                                // Pure slide in from left to right (backward)
                                 slideInHorizontally(animationSpec = tween(400)) { -it }
                                     .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { it / 2 })
                             }
                         },
                         label = "ScreenTransition"
-                    ) { screen ->
-                        when (screen) {
-                            "loading" -> LoadingScreen()
-                            "main" -> MainMenu(
-                                onLoginClick = { currentScreen = "login" },
-                                onRegisterClick = { currentScreen = "register" }
+                    ) { screenRoute ->
+                        when (screenRoute) {
+                            Screen.Loading.route -> LoadingScreen()
+                            Screen.Main.route -> MainMenu(
+                                onLoginClick = { currentScreen = Screen.Login.route },
+                                onRegisterClick = { currentScreen = Screen.Register.route }
                             )
-                            "register" -> RegisterScreen(
-                                onBackClick = { currentScreen = "main" },
-                                onRegisterSuccess = { currentScreen = "onboarding_time" }
+                            Screen.Register.route -> RegisterScreen(
+                                onBackClick = { currentScreen = Screen.Main.route },
+                                onRegisterSuccess = { currentScreen = Screen.OnboardingTime.route }
                             )
-                            "onboarding_time" -> OnboardingTimeScreen(
-                                onNext = { currentScreen = "onboarding_genre" }
+                            Screen.OnboardingTime.route -> OnboardingTimeScreen(
+                                onNext = { currentScreen = Screen.OnboardingGenre.route }
                             )
-                            "onboarding_genre" -> OnboardingGenreScreen(
-                                onFinish = { currentScreen = "coming_soon" }
+                            Screen.OnboardingGenre.route -> OnboardingGenreScreen(
+                                onFinish = { currentScreen = Screen.ComingSoon.route }
                             )
-                            "login" -> LoginScreen(
-                                onBackClick = { currentScreen = "main" },
-                                onForgotPasswordClick = { currentScreen = "forgot_password" },
-                                onLoginSuccess = { currentScreen = "coming_soon" }
+                            Screen.Login.route -> LoginScreen(
+                                onBackClick = { currentScreen = Screen.Main.route },
+                                onForgotPasswordClick = { currentScreen = Screen.ForgotPassword.route },
+                                onLoginSuccess = { currentScreen = Screen.ComingSoon.route }
                             )
-                            "forgot_password" -> ForgotPasswordScreen(
-                                onBackClick = { currentScreen = "login" },
-                                onConfirmCodeClick = { currentScreen = "create_new_password" }
+                            Screen.ForgotPassword.route -> ForgotPasswordScreen(
+                                onBackClick = { currentScreen = Screen.Login.route }
                             )
-                            "create_new_password" -> CreateNewPasswordScreen(
-                                onBackClick = { currentScreen = "forgot_password" },
-                                onPasswordCreated = { currentScreen = "login" }
+                            Screen.CreateNewPassword.route -> CreateNewPasswordScreen(
+                                onBackClick = { currentScreen = Screen.ForgotPassword.route },
+                                onPasswordCreated = { currentScreen = Screen.Login.route }
                             )
-                            "coming_soon" -> ComingSoonScreen(
-                                onBackClick = { currentScreen = "main" }
+                            Screen.ComingSoon.route -> ComingSoonScreen(
+                                onBackClick = { currentScreen = Screen.Main.route }
+                            )
+                            Screen.Books.route -> BooksView(
+                                onFavoritesClick = { currentScreen = Screen.ComingSoon.route },
+                                onSettingsClick = { currentScreen = Screen.Settings.route },
+                                onAddClick = { currentScreen = Screen.ComingSoon.route }
+                            )
+                            Screen.Settings.route -> SettingsView(
+                                onBackClick = { currentScreen = Screen.Books.route },
+                                onEditProfileClick = { currentScreen = Screen.EditProfile.route },
+                                onChangePasswordClick = { currentScreen = Screen.ChangePassword.route },
+                                onReadingSettingsClick = { currentScreen = Screen.ReadingSettings.route },
+                                onLogoutClick = { currentScreen = Screen.Main.route }
+                            )
+                            Screen.EditProfile.route -> EditProfileView(
+                                onBackClick = { currentScreen = Screen.Settings.route }
+                            )
+                            Screen.ChangePassword.route -> ChangePasswordView(
+                                onBackClick = { currentScreen = Screen.Settings.route }
+                            )
+                            Screen.ReadingSettings.route -> ReadingSettingsView(
+                                onBackClick = { currentScreen = Screen.Settings.route }
                             )
                         }
                     }

@@ -1,18 +1,20 @@
 package com.example.booktime.tadeo.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
+import com.example.booktime.tadeo.components.BooktimeButton
+import com.example.booktime.tadeo.components.BooktimeTextField
+import com.example.booktime.tadeo.components.ScreenWrapper
+import com.example.booktime.tadeo.utils.ValidationUtils
+
 @Composable
 fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
     val auth = FirebaseAuth.getInstance()
@@ -25,200 +27,96 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
+    val errorEmptyFields = stringResource(id = R.string.error_empty_fields)
+    val errorInvalidEmail = stringResource(id = R.string.error_invalid_email)
+    val errorPasswordRules = stringResource(id = R.string.error_password_rules)
+    val errorPasswordsDontMatch = stringResource(id = R.string.error_passwords_dont_match)
+
     if (showErrorDialog) {
         AnimatedDialog(
-            title = "Error de validación",
+            title = stringResource(id = R.string.error_title),
             text = errorMessage,
             onDismiss = { showErrorDialog = false }
         )
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF4A5A6E))
-    ) {
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier
-                .padding(top = 48.dp, start = 16.dp)
-                .align(Alignment.TopStart)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White
-            )
-        }
+    ScreenWrapper(onBackClick = onBackClick) {
+        Text(
+            text = stringResource(id = R.string.register_title),
+            style = MaterialTheme.typography.headlineLarge,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Crear Cuenta",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
+        BooktimeTextField(
+            value = name,
+            onValueChange = { name = it },
+            placeholder = stringResource(id = R.string.full_name_placeholder),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                placeholder = { Text("Nombre completo", style = MaterialTheme.typography.bodyLarge) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFD9D9D9),
-                    unfocusedContainerColor = Color(0xFFD9D9D9),
-                    focusedIndicatorColor = Color(0xFF54C35D),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
+        BooktimeTextField(
+            value = email,
+            onValueChange = { email = it },
+            placeholder = stringResource(id = R.string.email_placeholder),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                placeholder = { Text("Correo electrónico", style = MaterialTheme.typography.bodyLarge) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFD9D9D9),
-                    unfocusedContainerColor = Color(0xFFD9D9D9),
-                    focusedIndicatorColor = Color(0xFF54C35D),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
+        BooktimeTextField(
+            value = password,
+            onValueChange = { password = it },
+            placeholder = stringResource(id = R.string.password_placeholder),
+            modifier = Modifier.padding(bottom = 16.dp),
+            visualTransformation = PasswordVisualTransformation()
+        )
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                placeholder = { Text("Contraseña", style = MaterialTheme.typography.bodyLarge) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFD9D9D9),
-                    unfocusedContainerColor = Color(0xFFD9D9D9),
-                    focusedIndicatorColor = Color(0xFF54C35D),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
+        BooktimeTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            placeholder = stringResource(id = R.string.confirm_password_placeholder),
+            modifier = Modifier.padding(bottom = 32.dp),
+            visualTransformation = PasswordVisualTransformation()
+        )
 
-            OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                placeholder = { Text("Confirmar contraseña", style = MaterialTheme.typography.bodyLarge) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFD9D9D9),
-                    unfocusedContainerColor = Color(0xFFD9D9D9),
-                    focusedIndicatorColor = Color(0xFF54C35D),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
-
-            Button(
-                onClick = {
-                    if (isLoading) return@Button
-                    if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
-                        errorMessage = "Por favor, completa todos los espacios para continuar."
-                        showErrorDialog = true
-                    } else if (password.length < 8 || password.length > 16) {
-                        errorMessage = "La contraseña debe tener entre 8 y 16 caracteres."
-                        showErrorDialog = true
-                    } else if (password != confirmPassword) {
-                        errorMessage = "Las contraseñas no coinciden."
-                        showErrorDialog = true
-                    } else {
-                        isLoading = true
-
-                        auth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { task ->
-                                isLoading = false
-                                if (task.isSuccessful) {
-
-                                    val user = auth.currentUser
-                                    val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                                        .setDisplayName(name)
-                                        .build()
-
-                                    user?.updateProfile(profileUpdates)
-
-                                    onRegisterSuccess()
-
-                                } else {
-                                    val exception = task.exception
-
-                                    errorMessage = when (exception) {
-                                        is com.google.firebase.auth.FirebaseAuthUserCollisionException ->
-                                            "Este correo ya está registrado."
-                                        is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException ->
-                                            "Correo inválido."
-                                        else -> "Error al registrar usuario"
-                                    }
-                                    showErrorDialog = true
-                                }
-                            }
-                    }
-                },
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF54C35D),
-                    contentColor = Color.White
-                )
-            ) {
-
-                // 👇 ESTE ES EL CAMBIO VISUAL
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
+        BooktimeButton(
+            text = stringResource(id = R.string.register_button),
+            isLoading = isLoading,
+            onClick = {
+                if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                    errorMessage = errorEmptyFields
+                    showErrorDialog = true
+                } else if (!ValidationUtils.isValidEmail(email)) {
+                    errorMessage = errorInvalidEmail
+                    showErrorDialog = true
+                } else if (!ValidationUtils.isValidPassword(password)) {
+                    errorMessage = errorPasswordRules
+                    showErrorDialog = true
+                } else if (!ValidationUtils.passwordsMatch(password, confirmPassword)) {
+                    errorMessage = errorPasswordsDontMatch
+                    showErrorDialog = true
                 } else {
-                    Text(
-                        text = "Registrarse",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    isLoading = true
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            isLoading = false
+                            if (task.isSuccessful) {
+                                val user = auth.currentUser
+                                val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                                    .setDisplayName(name)
+                                    .build()
+                                user?.updateProfile(profileUpdates)
+                                onRegisterSuccess()
+                            } else {
+                                val exception = task.exception
+                                errorMessage = when (exception) {
+                                    is com.google.firebase.auth.FirebaseAuthUserCollisionException -> "Este correo ya está registrado."
+                                    else -> "Error al registrar: ${exception?.message}"
+                                }
+                                showErrorDialog = true
+                            }
+                        }
                 }
             }
-        }
+        )
     }
 }

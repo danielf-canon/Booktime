@@ -1,6 +1,5 @@
 package com.example.booktime.tadeo.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +14,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
+import com.example.booktime.tadeo.components.BooktimeButton
+import com.example.booktime.tadeo.components.ScreenWrapper
+import com.example.booktime.tadeo.ui.theme.ButtonGreen
 
 @Composable
 fun OnboardingGenreScreen(onFinish: () -> Unit) {
@@ -27,101 +31,78 @@ fun OnboardingGenreScreen(onFinish: () -> Unit) {
         "Poesía", "Cómics", "Clásicos"
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF4A5A6E))
-            .padding(horizontal = 24.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+    ScreenWrapper {
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Text(
+            text = stringResource(id = R.string.onboarding_genre_question),
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            lineHeight = 32.sp
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Genre Selection List (Scrollable)
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(64.dp))
-            
-            Text(
-                text = "¿Qué géneros literarios te gustan?",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                lineHeight = 32.sp
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // Genre Selection List (Scrollable)
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                items(genres) { genre ->
-                    val isSelected = selectedGenres.contains(genre)
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (isSelected) {
-                                    selectedGenres.remove(genre)
-                                } else {
-                                    selectedGenres.add(genre)
-                                }
-                            },
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (isSelected) Color(0xFF54C35D) else Color(0xFFD9D9D9),
-                        shadowElevation = 2.dp
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = genre,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
-                                ),
-                                color = if (isSelected) Color.White else Color(0xFF4A5A6E)
-                            )
+            items(genres) { genre ->
+                val isSelected = selectedGenres.contains(genre)
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
                             if (isSelected) {
-                                Text(
-                                    "✓",
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
+                                selectedGenres.remove(genre)
+                            } else {
+                                selectedGenres.add(genre)
                             }
+                        },
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (isSelected) ButtonGreen else Color(0xFFD9D9D9),
+                    shadowElevation = 2.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = genre,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            ),
+                            color = if (isSelected) Color.White else Color(0xFF4A5A6E)
+                        )
+                        if (isSelected) {
+                            Text(
+                                "✓",
+                                color = Color.White,
+                                style = MaterialTheme.typography.titleMedium
+                            )
                         }
                     }
                 }
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Button(
-                onClick = { if (selectedGenres.isNotEmpty()) onFinish() },
-                enabled = selectedGenres.isNotEmpty(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF54C35D),
-                    disabledContainerColor = Color(0xFF657285)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    "Finalizar",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(32.dp))
         }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        BooktimeButton(
+            text = stringResource(id = R.string.finish),
+            enabled = selectedGenres.isNotEmpty(),
+            onClick = { if (selectedGenres.isNotEmpty()) onFinish() }
+        )
+        
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
