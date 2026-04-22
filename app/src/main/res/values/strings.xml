@@ -88,4 +88,13 @@
     <string name="login_menu_button">Iniciar sesión</string>
     <string name="register_menu_button">Registrarse</string>
     <string name="app_version">Versión 1.0.0 (Beta)</string>
+
+    <!-- Favorite Books -->
+    <string name="new_book_title">Nuevo libro</string>
+    <string name="new_book_phrase">¿Qué historia nos espera ahora?</string>
+    <string name="new_book_button_online">BUSCAR ONLINE</string>
+    <string name="new_book_button_EBOOK">IMPORTAR EBOOK</string>
+    <string name="new_book_button_AUDIOLIBRO">IMPORTAR AUDIOLIBRO</string>
+
+
 </resources>

@@ -5,124 +5,239 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.google.firebase.FirebaseApp
-import androidx.compose.animation.AnimatedContent
+
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+
+import androidx.navigation.compose.*
+
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
 import com.example.booktime.tadeo.navigation.Screen
 import com.example.booktime.tadeo.views.*
+
 import kotlinx.coroutines.delay
 
-import com.google.firebase.auth.FirebaseAuth
-
+@OptIn(ExperimentalAnimationApi::class)
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
+
         setContent {
             BooktimeTheme {
+
+                val navController = rememberNavController()
                 val auth = FirebaseAuth.getInstance()
-                
-                var currentScreen by remember { mutableStateOf(Screen.Loading.route) }
-                
-                LaunchedEffect(Unit) {
-                    delay(3000) // Simulacion de carga
-                    currentScreen = if (auth.currentUser != null) {
-                        Screen.Books.route
-                    } else {
-                        Screen.Main.route
-                    }
-                }
-                
-                Box(
+
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Loading.route,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF4A5A6E))
                 ) {
-                    AnimatedContent(
-                        targetState = currentScreen,
-                        transitionSpec = {
-                            if (Screen.isForward(targetState) || (initialState == Screen.Loading.route && targetState == Screen.Main.route)) {
-                                slideInHorizontally(animationSpec = tween(400)) { it }
-                                    .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { -it / 2 })
+
+                     composable(
+                        route = Screen.Loading.route,
+                        enterTransition = { slideInRight() },
+                        exitTransition = { slideOutLeft() }
+                    ) {
+                        LaunchedEffect(Unit) {
+                            delay(3000)
+
+                            if (auth.currentUser != null) {
+                                navController.navigate(Screen.Books.route) {
+                                    popUpTo(Screen.Loading.route) { inclusive = true }
+                                }
                             } else {
-                                slideInHorizontally(animationSpec = tween(400)) { -it }
-                                    .togetherWith(slideOutHorizontally(animationSpec = tween(400)) { it / 2 })
+                                navController.navigate(Screen.Main.route) {
+                                    popUpTo(Screen.Loading.route) { inclusive = true }
+                                }
                             }
-                        },
-                        label = "ScreenTransition"
-                    ) { screenRoute ->
-                        when (screenRoute) {
-                            Screen.Loading.route -> LoadingScreen()
-                            Screen.Main.route -> MainMenu(
-                                onLoginClick = { currentScreen = Screen.Login.route },
-                                onRegisterClick = { currentScreen = Screen.Register.route }
-                            )
-                            Screen.Register.route -> RegisterScreen(
-                                onBackClick = { currentScreen = Screen.Main.route },
-                                onRegisterSuccess = { currentScreen = Screen.OnboardingTime.route }
-                            )
-                            Screen.OnboardingTime.route -> OnboardingTimeScreen(
-                                onNext = { currentScreen = Screen.OnboardingGenre.route }
-                            )
-                            Screen.OnboardingGenre.route -> OnboardingGenreScreen(
-                                onFinish = { currentScreen = Screen.ComingSoon.route }
-                            )
-                            Screen.Login.route -> LoginScreen(
-                                onBackClick = { currentScreen = Screen.Main.route },
-                                onForgotPasswordClick = { currentScreen = Screen.ForgotPassword.route },
-                                onLoginSuccess = { currentScreen = Screen.ComingSoon.route }
-                            )
-                            Screen.ForgotPassword.route -> ForgotPasswordScreen(
-                                onBackClick = { currentScreen = Screen.Login.route }
-                            )
-                            Screen.CreateNewPassword.route -> CreateNewPasswordScreen(
-                                onBackClick = { currentScreen = Screen.ForgotPassword.route },
-                                onPasswordCreated = { currentScreen = Screen.Login.route }
-                            )
-                            Screen.ComingSoon.route -> ComingSoonScreen(
-                                onBackClick = { currentScreen = Screen.Main.route }
-                            )
-                            Screen.Books.route -> BooksView(
-                                onFavoritesClick = { currentScreen = Screen.ComingSoon.route },
-                                onSettingsClick = { currentScreen = Screen.Settings.route },
-                                onAddClick = { currentScreen = Screen.ComingSoon.route }
-                            )
-                            Screen.Settings.route -> SettingsView(
-                                onBackClick = { currentScreen = Screen.Books.route },
-                                onEditProfileClick = { currentScreen = Screen.EditProfile.route },
-                                onChangePasswordClick = { currentScreen = Screen.ChangePassword.route },
-                                onReadingSettingsClick = { currentScreen = Screen.ReadingSettings.route },
-                                onLogoutClick = { currentScreen = Screen.Main.route }
-                            )
-                            Screen.EditProfile.route -> EditProfileView(
-                                onBackClick = { currentScreen = Screen.Settings.route }
-                            )
-                            Screen.ChangePassword.route -> ChangePasswordView(
-                                onBackClick = { currentScreen = Screen.Settings.route }
-                            )
-                            Screen.ReadingSettings.route -> ReadingSettingsView(
-                                onBackClick = { currentScreen = Screen.Settings.route }
-                            )
                         }
+
+                        LoadingScreen()
+                    }
+
+                    composable(
+                        route = Screen.Main.route,
+                        enterTransition = { slideInRight() },
+                        exitTransition = { slideOutLeft() },
+                        popEnterTransition = { slideInLeft() },
+                        popExitTransition = { slideOutRight() }
+                    ) {
+                        MainMenu(
+                            onLoginClick = { navController.navigate(Screen.Login.route) },
+                            onRegisterClick = { navController.navigate(Screen.Register.route) }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Login.route,
+                        enterTransition = { slideInRight() },
+                        popExitTransition = { slideOutRight() }
+                    ) {
+                        LoginScreen(
+                            onBackClick = { navController.popBackStack() },
+                            onForgotPasswordClick = {
+                                navController.navigate(Screen.ForgotPassword.route)
+                            },
+                            onLoginSuccess = {
+                                navController.navigate(Screen.Books.route) {
+                                    popUpTo(Screen.Main.route) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Register.route,
+                        enterTransition = { slideInRight() },
+                        popExitTransition = { slideOutRight() }
+                    ) {
+                        RegisterScreen(
+                            onBackClick = { navController.popBackStack() },
+                            onRegisterSuccess = {
+                                navController.navigate(Screen.OnboardingTime.route)
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.OnboardingTime.route,
+                        enterTransition = { slideInRight() },
+                        popExitTransition = { slideOutRight() }
+                    ) {
+                        OnboardingTimeScreen(
+                            onNext = {
+                                navController.navigate(Screen.OnboardingGenre.route)
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.OnboardingGenre.route,
+                        enterTransition = { slideInRight() },
+                        popExitTransition = { slideOutRight() }
+                    ) {
+                        OnboardingGenreScreen(
+                            onFinish = {
+                                navController.navigate(Screen.ComingSoon.route)
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ForgotPassword.route,
+                        popExitTransition = { slideOutRight() }
+                    ) {
+                        ForgotPasswordScreen(
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.ComingSoon.route
+                    ) {
+                        ComingSoonScreen(
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Books.route
+                    ) {
+                        BooksView(
+                            onFavoritesClick = {
+                                navController.navigate(Screen.ComingSoon.route)
+                            },
+                            onSettingsClick = {
+                                navController.navigate(Screen.Settings.route)
+                            },
+                            onAddClick = {
+                                navController.navigate(Screen.NewBook.route)
+                            }
+                        )
+                    }
+
+                    composable(Screen.Settings.route) {
+                        SettingsView(
+                            onBackClick = { navController.popBackStack() },
+                            onEditProfileClick = {
+                                navController.navigate(Screen.EditProfile.route)
+                            },
+                            onReadingSettingsClick = {
+                                navController.navigate(Screen.ReadingSettings.route)
+                            },
+                            onLogoutClick = {
+                                navController.navigate(Screen.Main.route) {
+                                    popUpTo(Screen.Main.route) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable(Screen.EditProfile.route) {
+                        EditProfileView(
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Screen.ReadingSettings.route) {
+                        ReadingSettingsView(
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    // ➕ NEW BOOK
+                    composable(Screen.NewBook.route) {
+                        NewBookScreen(
+                            navController = navController,
+                            onBackClick = { navController.popBackStack() },
+                            onSearchClick = { },
+                            onImportEbookClick = { navController.navigate(Screen.NewEbook.route) },
+                            onImportAudiobookClick = { }
+                        )
+                    }
+
+                    composable(Screen.NewEbook.route) {
+                        NewEbookScreen(
+                            navController = navController,
+                            onBackClick = { navController.popBackStack() }
+                        )
                     }
                 }
             }
         }
     }
 }
+
+fun slideInRight(): EnterTransition =
+    slideInHorizontally(
+        animationSpec = tween(400),
+        initialOffsetX = { it }
+    )
+
+fun slideOutLeft(): ExitTransition =
+    slideOutHorizontally(
+        animationSpec = tween(400),
+        targetOffsetX = { -it / 2 }
+    )
+
+fun slideInLeft(): EnterTransition =
+    slideInHorizontally(
+        animationSpec = tween(400),
+        initialOffsetX = { -it }
+    )
+
+fun slideOutRight(): ExitTransition =
+    slideOutHorizontally(
+        animationSpec = tween(400),
+        targetOffsetX = { it / 2 }
+    )

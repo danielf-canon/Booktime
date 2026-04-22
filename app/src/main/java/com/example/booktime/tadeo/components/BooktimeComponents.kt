@@ -7,6 +7,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +28,7 @@ import com.example.booktime.tadeo.ui.theme.FillRectangle
 import com.example.booktime.tadeo.ui.theme.PrincipalMenu
 
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.booktime.tadeo.R
 
 @Composable
@@ -208,6 +214,48 @@ fun SettingsSwitchItem(
                 checkedThumbColor = ButtonGreen,
                 checkedTrackColor = ButtonGreen.copy(alpha = 0.5f)
             )
+        )
+    }
+}
+@Composable
+fun BooktimeBottomNav(
+    selectedItem: Int = 2, // por defecto el botón central "+"
+    onItemSelected: (Int) -> Unit
+) {
+    NavigationBar(
+        containerColor = PrincipalMenu
+    ) {
+        val items = listOf(
+            Icons.Default.Menu,        // índice 0
+            Icons.Default.BarChart,    // índice 1
+            Icons.Default.Add,         // índice 2
+            Icons.Default.Bookmark,    // índice 3
+            Icons.Default.Person       // índice 4
+        )
+
+        items.forEachIndexed { index, icon ->
+            NavigationBarItem(
+                selected = selectedItem == index,
+                onClick = { onItemSelected(index) },
+                icon = {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = if (selectedItem == index) ButtonGreen else AppWhite
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BooktimeBottomNavPreview() {
+    MaterialTheme {
+        BooktimeBottomNav(
+            selectedItem = 2,
+            onItemSelected = {}
         )
     }
 }
