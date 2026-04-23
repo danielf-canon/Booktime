@@ -20,7 +20,7 @@ interface GoogleBooksApi {
 }
 
 class GoogleBooksRepository {
-    private val API_KEY = "AIzaSyC2O7on5beOgbIy_PISYmYSNOKkrPR9aFA"
+    private val API_KEY = "key"
     private val db = FirebaseFirestore.getInstance()
 
     private val api = Retrofit.Builder()
