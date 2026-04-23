@@ -8,6 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.example.booktime.tadeo.R
+import com.example.booktime.tadeo.components.BooktimeBottomNav
 import com.example.booktime.tadeo.components.BooktimeButton
 import com.example.booktime.tadeo.components.BooktimeTextField
 import com.example.booktime.tadeo.components.ScreenWrapper
@@ -18,7 +19,10 @@ import com.google.firebase.database.FirebaseDatabase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileView(onBackClick: () -> Unit = {}) {
+fun EditProfileView(
+    onBackClick: () -> Unit = {},
+    onBottomNavClick: (Int) -> Unit = {}
+) {
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser
     val database = FirebaseDatabase.getInstance().reference
@@ -27,45 +31,55 @@ fun EditProfileView(onBackClick: () -> Unit = {}) {
     var email by remember { mutableStateOf(user?.email ?: "") }
     var isLoading by remember { mutableStateOf(false) }
 
-    ScreenWrapper(onBackClick = onBackClick) {
-        // Sección: Información Básica
-        SettingsSectionTitle(stringResource(id = R.string.personal_info_section))
-        
-        BooktimeTextField(
-            value = name,
-            onValueChange = { name = it },
-            placeholder = stringResource(id = R.string.full_name_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
+    Scaffold(
+        bottomBar = { BooktimeBottomNav(selectedItem = 4, onItemSelected = onBottomNavClick) },
+        containerColor = com.example.booktime.tadeo.ui.theme.PrincipalMenu
+    ) { padding ->
+        ScreenWrapper(onBackClick = onBackClick) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding())
+            ) {
+                SettingsSectionTitle(stringResource(id = R.string.personal_info_section))
+                
+                BooktimeTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = stringResource(id = R.string.full_name_placeholder),
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
 
-        BooktimeTextField(
-            value = email,
-            onValueChange = { email = it },
-            placeholder = stringResource(id = R.string.email_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
+                BooktimeTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    placeholder = stringResource(id = R.string.email_placeholder),
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
 
-        Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
 
-        BooktimeButton(
-            text = stringResource(id = R.string.save_changes),
-            isLoading = isLoading,
-            onClick = {
-                if (user != null) {
-                    isLoading = true
-                    // Actualizar en Realtime Database
-                    val updates = mapOf(
-                        "name" to name,
-                        "email" to email
-                    )
-                    database.child("users").child(user.uid).updateChildren(updates)
-                        .addOnCompleteListener { 
-                            isLoading = false
-                            // Aquí podrías añadir un mensaje de éxito
+                BooktimeButton(
+                    text = stringResource(id = R.string.save_changes),
+                    isLoading = isLoading,
+                    onClick = {
+                        if (user != null) {
+                            isLoading = true
+                            // Actualizar en Realtime Database
+                            val updates = mapOf(
+                                "name" to name,
+                                "email" to email
+                            )
+                            database.child("users").child(user.uid).updateChildren(updates)
+                                .addOnCompleteListener { 
+                                    isLoading = false
+                                    // Aquí podrías añadir un mensaje de éxito
+                                }
                         }
-                }
+                    }
+                )
             }
-        )
+        }
     }
 }
 

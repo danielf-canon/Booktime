@@ -32,11 +32,12 @@ import java.util.*
 @Composable
 fun SearchBookView(
     navController: NavController,
+    onBottomNavClick: (Int) -> Unit = {},
     viewModel: SearchBookViewModel = viewModel()
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets.statusBars,
-        bottomBar = { BooktimeBottomNav(selectedItem = 2, onItemSelected = { }) },
+        bottomBar = { BooktimeBottomNav(selectedItem = 2, onItemSelected = onBottomNavClick) },
         containerColor = PrincipalMenu
     ) { padding ->
         Column(

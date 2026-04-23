@@ -30,9 +30,8 @@ import com.google.firebase.auth.FirebaseAuth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BooksView(
-    onFavoritesClick: () -> Unit = {},
-    onSettingsClick: () -> Unit = {},
-    onAddClick: () -> Unit = {}
+    onAddClick: () -> Unit = {},
+    onBottomNavClick: (Int) -> Unit
 ) {
     val repository = remember { GoogleBooksRepository() }
     val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -61,7 +60,10 @@ fun BooksView(
             )
         },
         bottomBar = {
-            BooktimeBottomNav(selectedItem = 1, onItemSelected = { /* Navegación */ })
+            BooktimeBottomNav(
+                selectedItem = 0,
+                onItemSelected = { index -> onBottomNavClick(index) }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClick, containerColor = ButtonGreen, contentColor = Color.White) {

@@ -40,6 +40,15 @@ class MainActivity : ComponentActivity() {
                 val auth = FirebaseAuth.getInstance()
                 val user = FirebaseAuth.getInstance().currentUser
                 val userId = user?.uid
+                val onBottomNavItemSelected: (Int) -> Unit = { index ->
+                    when (index) {
+                        0 -> navController.navigate(Screen.Books.route) // Biblioteca
+                        1 -> navController.navigate(Screen.ComingSoon.route)      // Estadisticas
+                        2 -> navController.navigate(Screen.NewBook.route)    // Botón central "+" añadir
+                        3 -> navController.navigate(Screen.ComingSoon.route) // Favoritos
+                        4 -> navController.navigate(Screen.Settings.route)   // Perfil
+                    }
+                }
 
                 NavHost(
                     navController = navController,
@@ -154,21 +163,13 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    composable(
-                        route = Screen.Books.route
-                    ) {
+                    composable(Screen.Books.route) {
                         BooksView(
-                            onFavoritesClick = {
-                                navController.navigate(Screen.ComingSoon.route)
-                            },
-                            onSettingsClick = {
-                                navController.navigate(Screen.Settings.route)
-                            },
-                            onAddClick = {
-                                navController.navigate(Screen.NewBook.route)
-                            }
+                            onAddClick = { navController.navigate(Screen.NewBook.route) },
+                            onBottomNavClick = onBottomNavItemSelected
                         )
                     }
+
 
                     composable(Screen.Settings.route) {
                         SettingsView(
@@ -183,13 +184,15 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.Main.route) {
                                     popUpTo(Screen.Main.route) { inclusive = true }
                                 }
-                            }
+                            },
+                            onBottomNavClick = onBottomNavItemSelected
                         )
                     }
 
                     composable(Screen.EditProfile.route) {
                         EditProfileView(
-                            onBackClick = { navController.popBackStack() }
+                            onBackClick = { navController.popBackStack() },
+                            onBottomNavClick = onBottomNavItemSelected
                         )
                     }
 
@@ -205,20 +208,23 @@ class MainActivity : ComponentActivity() {
                             onBackClick = { navController.popBackStack() },
                             onSearchClick = { navController.navigate(Screen.SearchBook.route) },
                             onImportEbookClick = { navController.navigate(Screen.NewEbook.route) },
-                            onImportAudiobookClick = { }
+                            onImportAudiobookClick = { },
+                            onBottomNavClick = onBottomNavItemSelected
                         )
                     }
 
                     composable(Screen.NewEbook.route) {
                         AddBookScreen(
                             userId = userId ?: "",
-                            onBackClick = { navController.popBackStack() }
+                            onBackClick = { navController.popBackStack() },
+                            onBottomNavClick = onBottomNavItemSelected
                         )
                     }
 
                     composable(Screen.SearchBook.route) {
                         SearchBookView(
-                            navController = navController
+                            navController = navController,
+                            onBottomNavClick = onBottomNavItemSelected
                         )
                     }
 

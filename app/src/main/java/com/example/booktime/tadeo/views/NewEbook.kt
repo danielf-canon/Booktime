@@ -25,7 +25,8 @@ import com.example.booktime.tadeo.viewmodels.AddBookViewModel
 fun AddBookScreen(
     viewModel: AddBookViewModel = AddBookViewModel(),
     userId: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onBottomNavClick: (Int) -> Unit = {}
 ) {
     val state = viewModel.state
     val context = LocalContext.current
@@ -35,7 +36,7 @@ fun AddBookScreen(
 
     Scaffold(
         bottomBar = {
-            BooktimeBottomNav(selectedItem = 2, onItemSelected = { /* Navegación */ })
+            BooktimeBottomNav(selectedItem = 2, onItemSelected = onBottomNavClick)
         }
     ) { padding ->
         ScreenWrapper(onBackClick = onBackClick) {

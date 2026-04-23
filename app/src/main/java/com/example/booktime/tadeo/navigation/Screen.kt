@@ -20,6 +20,9 @@ sealed class Screen(val route: String) {
 
     object BookAddedSuccess : Screen("book_added_success")
 
+    object FavoriteBooks : Screen("favorite_books")
+
+
 
 
     companion object {

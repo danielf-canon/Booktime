@@ -29,7 +29,8 @@ fun NewBookScreen(
     onBackClick: () -> Unit,
     onSearchClick: () -> Unit,
     onImportEbookClick: () -> Unit,
-    onImportAudiobookClick: () -> Unit
+    onImportAudiobookClick: () -> Unit,
+    onBottomNavClick: (Int) -> Unit = {}
 ) {
 
     var selectedItem by remember { mutableIntStateOf(2) }
@@ -85,14 +86,7 @@ fun NewBookScreen(
             selectedItem = selectedItem,
             onItemSelected = { index ->
                 selectedItem = index
-
-                when (index) {
-                    0 -> navController.navigate(Screen.Main.route)
-                    1 -> navController.navigate("stats")
-                    2 -> navController.navigate(Screen.NewBook.route)
-                    3 -> navController.navigate(Screen.ComingSoon.route)
-                    4 -> navController.navigate(Screen.Settings.route)
-                }
+                onBottomNavClick(index)
             }
         )
     }
