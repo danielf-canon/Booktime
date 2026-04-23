@@ -96,5 +96,16 @@
     <string name="new_book_button_EBOOK">IMPORTAR EBOOK</string>
     <string name="new_book_button_AUDIOLIBRO">IMPORTAR AUDIOLIBRO</string>
 
-
+    <!-- Import E-book Screen -->
+    <string name="import_ebook_title">IMPORTAR E-BOOK</string>
+    <string name="supported_formats_label">Formatos soportados</string>
+    <string name="format_epub">EPUB</string>
+    <string name="format_pdf">PDF</string>
+    <string name="format_mobi">MOBI</string>
+    <string name="choose_file_button">Elegir archivo</string>
+    <string name="book_title_label">Título</string>
+    <string name="book_author_label">Autor</string>
+    <string name="book_genre_label">Género</string>
+    <string name="save_book_button">GUARDAR</string>
+    <string name="book_saved_success">Libro guardado correctamente 🎉</string>
 </resources>

@@ -50,7 +50,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
             value = email,
             onValueChange = { email = it },
             placeholder = stringResource(id = R.string.email_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         BooktimeTextField(
@@ -58,7 +58,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
             onValueChange = { password = it },
             placeholder = stringResource(id = R.string.password_placeholder),
             modifier = Modifier.padding(bottom = 8.dp),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
         )
 
         TextButton(

@@ -49,7 +49,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit) {
             value = email,
             onValueChange = { email = it },
             placeholder = stringResource(id = R.string.email_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         BooktimeButton(

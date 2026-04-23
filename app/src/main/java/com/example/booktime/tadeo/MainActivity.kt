@@ -10,8 +10,10 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -36,6 +38,8 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
                 val auth = FirebaseAuth.getInstance()
+                val user = FirebaseAuth.getInstance().currentUser
+                val userId = user?.uid
 
                 NavHost(
                     navController = navController,
@@ -195,20 +199,58 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // ➕ NEW BOOK
                     composable(Screen.NewBook.route) {
                         NewBookScreen(
                             navController = navController,
                             onBackClick = { navController.popBackStack() },
-                            onSearchClick = { },
+                            onSearchClick = { navController.navigate(Screen.SearchBook.route) },
                             onImportEbookClick = { navController.navigate(Screen.NewEbook.route) },
                             onImportAudiobookClick = { }
                         )
                     }
 
                     composable(Screen.NewEbook.route) {
-                        NewEbookScreen(
-                            navController = navController,
+                        AddBookScreen(
+                            userId = userId ?: "",
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Screen.SearchBook.route) {
+                        SearchBookView(
+                            navController = navController
+                        )
+                    }
+
+                    composable(
+                        route = "${Screen.BookAddedSuccess.route}/{title}/{author}/{imageUrl}?date={date}",
+                        arguments = listOf(
+                            navArgument("title") { type = NavType.StringType },
+                            navArgument("author") { type = NavType.StringType },
+                            navArgument("imageUrl") { type = NavType.StringType },
+                            navArgument("date") {
+                                type = NavType.StringType
+                                defaultValue = "Desconocida"
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val title = backStackEntry.arguments?.getString("title") ?: ""
+                        val author = backStackEntry.arguments?.getString("author") ?: ""
+                        val date = backStackEntry.arguments?.getString("date") ?: ""
+
+                        val encodedUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+                        val imageUrl = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
+
+                        BookAddedSuccessView(
+                            title = title,
+                            author = author,
+                            imageUrl = imageUrl,
+                            dateAdded = date,
+                            onStartClick = {
+                                navController.navigate(Screen.Books.route) {
+                                    popUpTo(Screen.Books.route) { inclusive = true }
+                                }
+                            },
                             onBackClick = { navController.popBackStack() }
                         )
                     }

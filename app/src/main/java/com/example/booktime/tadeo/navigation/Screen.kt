@@ -16,6 +16,12 @@ sealed class Screen(val route: String) {
     object NewBook : Screen("add_books")
     object NewEbook : Screen("add_ebooks")
 
+    object SearchBook : Screen("search_book")
+
+    object BookAddedSuccess : Screen("book_added_success")
+
+
+
     companion object {
         fun isForward(route: String): Boolean {
             return route in listOf(

@@ -52,14 +52,14 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
             value = name,
             onValueChange = { name = it },
             placeholder = stringResource(id = R.string.full_name_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         BooktimeTextField(
             value = email,
             onValueChange = { email = it },
             placeholder = stringResource(id = R.string.email_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         BooktimeTextField(
@@ -67,7 +67,7 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
             onValueChange = { password = it },
             placeholder = stringResource(id = R.string.password_placeholder),
             modifier = Modifier.padding(bottom = 16.dp),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
         )
 
         BooktimeTextField(
@@ -75,7 +75,7 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
             onValueChange = { confirmPassword = it },
             placeholder = stringResource(id = R.string.confirm_password_placeholder),
             modifier = Modifier.padding(bottom = 32.dp),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
         )
 
         BooktimeButton(

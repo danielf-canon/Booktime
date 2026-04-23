@@ -35,14 +35,14 @@ fun EditProfileView(onBackClick: () -> Unit = {}) {
             value = name,
             onValueChange = { name = it },
             placeholder = stringResource(id = R.string.full_name_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         BooktimeTextField(
             value = email,
             onValueChange = { email = it },
             placeholder = stringResource(id = R.string.email_placeholder),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         Spacer(modifier = Modifier.weight(1f))
