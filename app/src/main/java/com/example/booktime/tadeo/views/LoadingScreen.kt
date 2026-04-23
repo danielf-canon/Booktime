@@ -17,6 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.booktime.tadeo.R
 
+import androidx.compose.ui.res.stringResource
+
 @Composable
 fun LoadingScreen() {
     Box(
@@ -30,7 +32,7 @@ fun LoadingScreen() {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = "App Logo",
+                contentDescription = stringResource(id = R.string.app_name),
                 modifier = Modifier.size(150.dp)
             )
             

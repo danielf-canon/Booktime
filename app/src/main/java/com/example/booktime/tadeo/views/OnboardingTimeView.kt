@@ -22,11 +22,11 @@ fun OnboardingTimeScreen(onNext: () -> Unit) {
     var selectedTime by remember { mutableStateOf("") }
     
     val readingTimes = listOf(
-        "15 minutos",
-        "30 minutos",
-        "1 hora",
-        "2 horas",
-        "Más de 3 horas"
+        stringResource(id = R.string.time_15min),
+        stringResource(id = R.string.time_30min),
+        stringResource(id = R.string.time_1hour),
+        stringResource(id = R.string.time_2hours),
+        stringResource(id = R.string.time_more3hours)
     )
 
     ScreenWrapper {

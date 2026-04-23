@@ -1,83 +1,104 @@
 package com.example.booktime.tadeo.viewmodels
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.booktime.tadeo.data.repository.BookRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.example.booktime.tadeo.R
+import androidx.core.graphics.createBitmap
 
-data class AddBookState(
-    val title: String = "",
-    val author: String = "",
-    val genre: String = "",
-    val fileUri: Uri? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val success: Boolean = false
-)
+class AddBookViewModel : ViewModel() {
+    private val repository = BookRepository()
 
-class AddBookViewModel(
-    private val repository: BookRepository = BookRepository()
-) : ViewModel() {
+    var title by mutableStateOf("")
+    var author by mutableStateOf("")
+    var genre by mutableStateOf("")
+    var selectedUri by mutableStateOf<Uri?>(null)
+    var coverBitmap by mutableStateOf<Bitmap?>(null)
+    var isLoading by mutableStateOf(false)
+    var errorMessage by mutableStateOf<String?>(null)
 
-    var state by mutableStateOf(AddBookState())
-        private set
 
-    fun onTitleChange(value: String) {
-        state = state.copy(title = value)
+    fun onFileSelected(uri: Uri, context: Context, fileName: String) {
+        selectedUri = uri
+
+
+        val cleanName = fileName.replace(".pdf", "", true)
+            .replace(".epub", "", true)
+            .replace("_", " ")
+
+        if (cleanName.contains("-")) {
+            val parts = cleanName.split("-")
+            title = parts[0].trim()
+            author = parts[1].trim()
+        } else {
+            title = cleanName.trim()
+        }
+
+        viewModelScope.launch {
+            if (context.contentResolver.getType(uri) == "application/pdf") {
+                extractPdfCover(uri, context)
+            }
+        }
     }
 
-    fun onAuthorChange(value: String) {
-        state = state.copy(author = value)
+    private suspend fun extractPdfCover(uri: Uri, context: Context) = withContext(Dispatchers.IO) {
+        try {
+            val pfd: ParcelFileDescriptor? = context.contentResolver.openFileDescriptor(uri, "r")
+            pfd?.use { fd ->
+                val renderer = PdfRenderer(fd)
+                if (renderer.pageCount > 0) {
+                    val page = renderer.openPage(0)
+                    val bitmap = createBitmap(page.width, page.height)
+                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                    withContext(Dispatchers.Main) {
+                        coverBitmap = bitmap
+                    }
+                    page.close()
+                }
+                renderer.close()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
-    fun onGenreChange(value: String) {
-        state = state.copy(genre = value)
-    }
-
-    fun onFileSelected(uri: Uri) {
-        state = state.copy(fileUri = uri)
-    }
-
-    fun saveBook(userId: String, context: Context) {
-
-        val uri = state.fileUri ?: run {
-            state = state.copy(error = "Selecciona un archivo")
+    // Dentro de AddBookViewModel.kt
+    fun saveBook(userId: String, context: Context, onSuccess: () -> Unit) {
+        if (selectedUri == null || title.isBlank()) {
+            errorMessage = context.getString(R.string.error_select_file_and_title)
             return
         }
 
         viewModelScope.launch {
-            state = state.copy(isLoading = true, error = null)
+            isLoading = true
+            errorMessage = null
 
             val result = repository.uploadBook(
-                uri,
-                state.title,
-                state.author,
-                state.genre,
-                userId,
-                context
+                uri = selectedUri!!,
+                title = title,
+                author = author,
+                genre = genre,
+                userId = userId,
+                context = context
             )
 
-            state = result.fold(
-                onSuccess = {
-                    state.copy(
-                        isLoading = false,
-                        success = true,
-                        title = "",
-                        author = "",
-                        genre = "",
-                        fileUri = null
-                    )
-                },
-                onFailure = {
-                    state.copy(
-                        isLoading = false,
-                        error = it.message ?: "Error desconocido"
-                    )
-                }
-            )
+            if (result.isSuccess) {
+                onSuccess()
+            } else {
+                errorMessage = context.getString(R.string.error_saving_book, result.exceptionOrNull()?.message)
+            }
+            isLoading = false
         }
     }
+
 }

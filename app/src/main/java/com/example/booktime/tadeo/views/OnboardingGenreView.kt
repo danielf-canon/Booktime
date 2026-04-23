@@ -25,10 +25,18 @@ fun OnboardingGenreScreen(onFinish: () -> Unit) {
     val selectedGenres = remember { mutableStateListOf<String>() }
     
     val genres = listOf(
-        "Fantasía", "Ciencia Ficción", "Misterio", 
-        "Romance", "Terror", "Aventura", 
-        "Historia", "Biografía", "Autoayuda",
-        "Poesía", "Cómics", "Clásicos"
+        stringResource(id = R.string.genre_fantasy),
+        stringResource(id = R.string.genre_scifi),
+        stringResource(id = R.string.genre_mystery),
+        stringResource(id = R.string.genre_romance),
+        stringResource(id = R.string.genre_horror),
+        stringResource(id = R.string.genre_adventure),
+        stringResource(id = R.string.genre_history),
+        stringResource(id = R.string.genre_biography),
+        stringResource(id = R.string.genre_selfhelp),
+        stringResource(id = R.string.genre_poetry),
+        stringResource(id = R.string.genre_comics),
+        stringResource(id = R.string.genre_classic)
     )
 
     ScreenWrapper {

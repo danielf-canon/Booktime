@@ -57,7 +57,7 @@ fun SearchBookView(
             BooktimeTextField(
                 value = viewModel.query,
                 onValueChange = { viewModel.query = it },
-                placeholder = "Harry Potter",
+                placeholder = "Buscar",
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { viewModel.onSearch() }),
                 modifier = Modifier.fillMaxWidth()

@@ -11,6 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
+
 @Composable
 fun ComingSoonScreen(onBackClick: () -> Unit) {
     Box(
@@ -27,7 +30,7 @@ fun ComingSoonScreen(onBackClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(id = R.string.back),
                 tint = Color.White
             )
         }
@@ -36,13 +39,13 @@ fun ComingSoonScreen(onBackClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Próximamente",
+                text = stringResource(id = R.string.coming_soon_title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Esta función estará disponible pronto.",
+                text = stringResource(id = R.string.coming_soon_desc),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White.copy(alpha = 0.7f)
             )

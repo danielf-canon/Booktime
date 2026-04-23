@@ -21,6 +21,10 @@ import com.example.booktime.tadeo.components.BooktimeButton
 import com.example.booktime.tadeo.components.ScreenWrapper
 import com.example.booktime.tadeo.components.SettingsSectionTitle
 
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
+import com.example.booktime.tadeo.ui.theme.BooktimeTheme
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadingSettingsView(onBackClick: () -> Unit = {}) {
@@ -37,7 +41,7 @@ fun ReadingSettingsView(onBackClick: () -> Unit = {}) {
         ) {
             Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Así se verá el texto de tus libros con esta configuración.",
+                    text = stringResource(id = R.string.preview_text),
                     fontSize = fontSize.sp,
                     color = Color.White,
                     lineHeight = (fontSize * 1.5).sp
@@ -48,7 +52,7 @@ fun ReadingSettingsView(onBackClick: () -> Unit = {}) {
         Spacer(modifier = Modifier.height(32.dp))
 
         // Tamaño de fuente
-        SettingsSectionTitle("Tamaño de Fuente: ${fontSize.toInt()}sp")
+        SettingsSectionTitle(stringResource(id = R.string.font_size_label, fontSize.toInt()))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.TextFields, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
             Slider(
@@ -68,7 +72,7 @@ fun ReadingSettingsView(onBackClick: () -> Unit = {}) {
         Spacer(modifier = Modifier.weight(1f))
 
         BooktimeButton(
-            text = "Aplicar Cambios",
+            text = stringResource(id = R.string.apply_changes),
             onClick = { /* Aplicar */ }
         )
     }

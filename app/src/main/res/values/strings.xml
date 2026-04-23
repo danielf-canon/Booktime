@@ -76,7 +76,25 @@
 
     <!-- Onboarding -->
     <string name="onboarding_time_question">¿Cuánto tiempo quieres leer?</string>
+    <string name="time_15min">15 minutos</string>
+    <string name="time_30min">30 minutos</string>
+    <string name="time_1hour">1 hora</string>
+    <string name="time_2hours">2 horas</string>
+    <string name="time_more3hours">Más de 3 horas</string>
     <string name="onboarding_genre_question">¿Qué géneros literarios te gustan?</string>
+    <string name="genre_fantasy">Fantasía</string>
+    <string name="genre_romance">Romance</string>
+    <string name="genre_thriller">Thriller</string>
+    <string name="genre_scifi">Ciencia Ficción</string>
+    <string name="genre_history">Historia</string>
+    <string name="genre_mystery">Misterio</string>
+    <string name="genre_biography">Biografía</string>
+    <string name="genre_classic">Clásicos</string>
+    <string name="genre_horror">Terror</string>
+    <string name="genre_adventure">Aventura</string>
+    <string name="genre_selfhelp">Autoayuda</string>
+    <string name="genre_poetry">Poesía</string>
+    <string name="genre_comics">Cómics</string>
 
     <!-- Books -->
     <string name="my_books_title">Mis Libros</string>
@@ -108,4 +126,40 @@
     <string name="book_genre_label">Género</string>
     <string name="save_book_button">GUARDAR</string>
     <string name="book_saved_success">Libro guardado correctamente 🎉</string>
+    <!-- Search Book -->
+    <string name="search_online_title">Buscar en línea</string>
+    <string name="search_placeholder">Harry Potter</string>
+    <string name="save_button">Guardar</string>
+    <string name="label_title">TITULO</string>
+    <string name="label_author">AUTOR</string>
+    <string name="label_genre">GÉNERO</string>
+    <string name="unknown_author">Desconocido</string>
+    <string name="default_genre">Fantasía</string>
+
+    <!-- Coming Soon -->
+    <string name="coming_soon_title">Próximamente</string>
+    <string name="coming_soon_desc">Esta función estará disponible pronto.</string>
+
+    <!-- Books View -->
+    <string name="no_books_yet">No tienes libros aún</string>
+    <string name="file_ready">ARCHIVO LISTO</string>
+
+    <!-- Auth Errors -->
+    <string name="error_user_not_found">El usuario no existe.</string>
+    <string name="error_wrong_password">Contraseña incorrecta.</string>
+    <string name="error_login_generic">Error al iniciar sesión: %1$s</string>
+    <string name="error_email_collision">Este correo ya está registrado.</string>
+    <string name="error_register_generic">Error al registrar: %1$s</string>
+
+    <!-- ViewModel Errors -->
+    <string name="error_select_file_and_title">Selecciona un archivo y escribe un título</string>
+    <string name="error_saving_book">Error al guardar el libro: %1$s</string>
+
+    <!-- Book Added Success -->
+    <string name="book_added_successfully">Tu libro ha sido añadido!</string>
+    <string name="start_reading_button">Iniciar</string>
+    <string name="book_added_date">Agregado el %1$s</string>
+    <string name="reading_progress_label">Progreso: %1$d%%</string>
+    <string name="book_quote">Abrir un libro es abrir un universo.\n¿Te atreves a explorarlo?</string>
+    <string name="ok_button">Entendido</string>
 </resources>

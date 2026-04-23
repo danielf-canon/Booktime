@@ -21,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
 import com.example.booktime.tadeo.components.BooktimeBottomNav
 import com.example.booktime.tadeo.data.model.Book
 import com.example.booktime.tadeo.data.repository.GoogleBooksRepository
@@ -49,7 +51,7 @@ fun BooksView(
         containerColor = PrincipalMenu,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Mis Libros", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.my_books_title), color = Color.White, fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = PrincipalMenu,
                     scrolledContainerColor = Color.Unspecified,
@@ -77,11 +79,11 @@ fun BooksView(
             }
         } else if (books.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No tienes libros aún", color = Color.White.copy(alpha = 0.5f))
+                Text(stringResource(id = R.string.no_books_yet), color = Color.White.copy(alpha = 0.5f))
             }
         } else {
             Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
-                Text("Biblioteca Digital", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(id = R.string.digital_library), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(16.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),

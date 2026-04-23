@@ -18,6 +18,7 @@ import com.example.booktime.tadeo.utils.ValidationUtils
 @Composable
 fun ForgotPasswordScreen(onBackClick: () -> Unit) {
     val auth = FirebaseAuth.getInstance()
+    val context = androidx.compose.ui.platform.LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
     var successMessage by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -70,7 +71,7 @@ fun ForgotPasswordScreen(onBackClick: () -> Unit) {
                             if (task.isSuccessful) {
                                 successMessage = recoverySuccessMsg
                             } else {
-                                errorMessage = "Error al enviar correo: ${task.exception?.message}"
+                                errorMessage = "Error: ${task.exception?.message}"
                                 showErrorDialog = true
                             }
                         }

@@ -14,6 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
+
 @Composable
 fun AnimatedDialog(title: String, text: String, onDismiss: () -> Unit) {
     var isVisible by remember { mutableStateOf(false) }
@@ -58,7 +61,7 @@ fun AnimatedDialog(title: String, text: String, onDismiss: () -> Unit) {
                         modifier = Modifier.align(Alignment.End)
                     ) {
                         Text(
-                            text = "Entendido",
+                            text = stringResource(id = R.string.ok_button),
                             color = Color(0xFF54C35D)
                         )
                     }

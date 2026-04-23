@@ -204,7 +204,6 @@ class MainActivity : ComponentActivity() {
 
                     composable(Screen.NewBook.route) {
                         NewBookScreen(
-                            navController = navController,
                             onBackClick = { navController.popBackStack() },
                             onSearchClick = { navController.navigate(Screen.SearchBook.route) },
                             onImportEbookClick = { navController.navigate(Screen.NewEbook.route) },

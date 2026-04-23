@@ -19,6 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import com.example.booktime.tadeo.R
 import com.example.booktime.tadeo.ui.theme.*
 
 @Composable
@@ -63,7 +65,7 @@ fun BookAddedSuccessView(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Flecha estándar de Android
-                            contentDescription = "Atrás",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = AppWhite,
                             modifier = Modifier.size(28.dp) // Tamaño más visible
                         )
@@ -100,7 +102,7 @@ fun BookAddedSuccessView(
                 )
 
                 Text(
-                    text = "Progreso: 0%",
+                    text = stringResource(id = R.string.reading_progress_label, 0),
                     color = AppWhite.copy(alpha = 0.6f),
                     fontSize = 14.sp,
                     modifier = Modifier.padding(top = 8.dp)
@@ -109,7 +111,7 @@ fun BookAddedSuccessView(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Abrir un libro es abrir un universo.\n¿Te atreves a explorarlo?",
+                    text = stringResource(id = R.string.book_quote),
                     color = AppWhite,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,
@@ -125,13 +127,13 @@ fun BookAddedSuccessView(
                     colors = ButtonDefaults.buttonColors(containerColor = ButtonGreen),
                     shape = RoundedCornerShape(28.dp)
                 ) {
-                    Text("Iniciar", color = AppWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.start_reading_button), color = AppWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Tu libro ha sido añadido!",
+                    text = stringResource(id = R.string.book_added_successfully),
                     color = ButtonGreen,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
@@ -144,7 +146,7 @@ fun BookAddedSuccessView(
                 )
 
                 Text(
-                    text = "Agregado el $dateAdded",
+                    text = stringResource(id = R.string.book_added_date, dateAdded),
                     color = AppWhite.copy(alpha = 0.5f),
                     fontSize = 12.sp
                 )

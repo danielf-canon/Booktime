@@ -54,3 +54,13 @@ class GoogleBooksRepository {
         }
     }
 }
+
+//Cosas para estudiar de IA
+
+/*Representación de Distancias
+Regresión Lineal Simple
+Regresión Lineal Múltiple
+Clasificador KNN: K-Nearest Neighbors
+Clasificador KNN: Proyecto Cáncer de Seno
+Clustering: K-Means*/
+

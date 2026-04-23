@@ -15,17 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.booktime.tadeo.R
 import com.example.booktime.tadeo.components.BooktimeBottomNav
 import com.example.booktime.tadeo.components.BooktimeButton
 import com.example.booktime.tadeo.components.ScreenWrapper
-import com.example.booktime.tadeo.navigation.Screen
 import com.example.booktime.tadeo.ui.theme.AppWhite
 
 @Composable
 fun NewBookScreen(
-    navController: NavController,
     onBackClick: () -> Unit,
     onSearchClick: () -> Unit,
     onImportEbookClick: () -> Unit,

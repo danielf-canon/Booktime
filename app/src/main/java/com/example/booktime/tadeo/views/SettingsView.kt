@@ -140,7 +140,7 @@ fun SettingsView(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Versión 1.0.0 (Beta)",
+                    text = stringResource(id = R.string.app_version),
                     color = Color.White.copy(alpha = 0.5f),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     fontSize = 12.sp

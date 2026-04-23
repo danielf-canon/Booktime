@@ -11,8 +11,6 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import androidx.compose.ui.res.stringResource
-import com.example.booktime.tadeo.R
 import com.example.booktime.tadeo.components.BooktimeButton
 import com.example.booktime.tadeo.components.BooktimeTextField
 import com.example.booktime.tadeo.components.ScreenWrapper
@@ -27,12 +25,12 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    val errorEmptyFields = stringResource(id = R.string.error_empty_fields)
-    val errorInvalidEmail = stringResource(id = R.string.error_invalid_email)
+    val errorEmptyFields = "Por favor, completa todos los campos."
+    val errorInvalidEmail = "Por favor, ingresa un correo electrónico válido."
 
     if (showErrorDialog) {
         AnimatedDialog(
-            title = stringResource(id = R.string.error_title),
+            title = "Error",
             text = errorMessage,
             onDismiss = { showErrorDialog = false }
         )
@@ -40,7 +38,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
 
     ScreenWrapper(onBackClick = onBackClick) {
         Text(
-            text = stringResource(id = R.string.login_title),
+            text = "Iniciar Sesión",
             style = MaterialTheme.typography.headlineLarge,
             color = Color.White,
             modifier = Modifier.padding(bottom = 32.dp)
@@ -49,14 +47,14 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
         BooktimeTextField(
             value = email,
             onValueChange = { email = it },
-            placeholder = stringResource(id = R.string.email_placeholder),
+            placeholder = "Correo electrónico",
             modifier = Modifier.padding(bottom = 16.dp),
         )
 
         BooktimeTextField(
             value = password,
             onValueChange = { password = it },
-            placeholder = stringResource(id = R.string.password_placeholder),
+            placeholder = "Contraseña",
             modifier = Modifier.padding(bottom = 8.dp),
             visualTransformation = PasswordVisualTransformation(),
         )
@@ -66,7 +64,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
             modifier = Modifier.align(Alignment.End)
         ) {
             Text(
-                text = stringResource(id = R.string.forgot_password_link),
+                text = "¿Olvidaste tu contraseña?",
                 color = Color.White,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -75,7 +73,7 @@ fun LoginScreen(onBackClick: () -> Unit, onForgotPasswordClick: () -> Unit, onLo
         Spacer(modifier = Modifier.height(24.dp))
 
         BooktimeButton(
-            text = stringResource(id = R.string.login_button),
+            text = "Entrar",
             isLoading = isLoading,
             onClick = {
                 if (email.isBlank() || password.isBlank()) {

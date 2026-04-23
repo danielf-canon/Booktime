@@ -18,6 +18,7 @@ import com.example.booktime.tadeo.utils.ValidationUtils
 @Composable
 fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
     val auth = FirebaseAuth.getInstance()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
