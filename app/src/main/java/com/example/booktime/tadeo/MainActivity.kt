@@ -7,8 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 
@@ -24,6 +25,9 @@ import com.example.booktime.tadeo.views.*
 
 import kotlinx.coroutines.delay
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.booktime.tadeo.viewmodels.SettingsViewModel
+
 @OptIn(ExperimentalAnimationApi::class)
 class MainActivity : ComponentActivity() {
 
@@ -35,35 +39,63 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BooktimeTheme {
-
                 val navController = rememberNavController()
-                val auth = FirebaseAuth.getInstance()
-                val user = FirebaseAuth.getInstance().currentUser
-                val userId = user?.uid
+                val auth = remember { FirebaseAuth.getInstance() }
+                val settingsViewModel: SettingsViewModel = viewModel()
+                
+                // Observar el estado de la sesión de forma reactiva
+                var currentUser by remember { mutableStateOf(auth.currentUser) }
+
+                // Listener para cambios de estado de autenticación (Cierre de sesión global)
+                DisposableEffect(auth) {
+                    val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+                        val user = firebaseAuth.currentUser
+                        currentUser = user
+                        
+                        if (user == null) {
+                            // Si el usuario cierra sesión, limpiamos TODO el stack y mandamos al Main
+                            navController.navigate(Screen.Main.route) {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            // Cuando un usuario inicia sesión o la app arranca con uno, 
+                            // aseguramos que se carguen sus ajustes y se programen sus alarmas.
+                            settingsViewModel.loadSettings()
+                        }
+                    }
+                    auth.addAuthStateListener(listener)
+                    onDispose {
+                        auth.removeAuthStateListener(listener)
+                    }
+                }
+
                 val onBottomNavItemSelected: (Int) -> Unit = { index ->
                     when (index) {
-                        0 -> navController.navigate(Screen.Books.route) // Biblioteca
-                        1 -> navController.navigate(Screen.ComingSoon.route)      // Estadisticas
-                        2 -> navController.navigate(Screen.NewBook.route)    // Botón central "+" añadir
-                        3 -> navController.navigate(Screen.ComingSoon.route) // Favoritos
-                        4 -> navController.navigate(Screen.Settings.route)   // Perfil
+                        0 -> navController.navigate(Screen.Books.route)
+                        1 -> navController.navigate(Screen.FavoriteBooks.route)
+                        2 -> navController.navigate(Screen.NewBook.route)
+                        3 -> navController.navigate(Screen.ComingSoon.route)
+                        4 -> navController.navigate(Screen.Settings.route)
                     }
                 }
 
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Loading.route,
-                    modifier = Modifier
+                    modifier = Modifier,
+                    enterTransition = { slideInRight() },
+                    exitTransition = { slideOutLeft() },
+                    popEnterTransition = { slideInLeft() },
+                    popExitTransition = { slideOutRight() }
                 ) {
-
-                     composable(
+                    composable(
                         route = Screen.Loading.route,
-                        enterTransition = { slideInRight() },
-                        exitTransition = { slideOutLeft() }
+                        enterTransition = { fadeIn(animationSpec = tween(500)) },
+                        exitTransition = { fadeOut(animationSpec = tween(500)) }
                     ) {
                         LaunchedEffect(Unit) {
-                            delay(3000)
-
+                            delay(2000)
                             if (auth.currentUser != null) {
                                 navController.navigate(Screen.Books.route) {
                                     popUpTo(Screen.Loading.route) { inclusive = true }
@@ -74,33 +106,20 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-
                         LoadingScreen()
                     }
 
-                    composable(
-                        route = Screen.Main.route,
-                        enterTransition = { slideInRight() },
-                        exitTransition = { slideOutLeft() },
-                        popEnterTransition = { slideInLeft() },
-                        popExitTransition = { slideOutRight() }
-                    ) {
+                    composable(route = Screen.Main.route) {
                         MainMenu(
                             onLoginClick = { navController.navigate(Screen.Login.route) },
                             onRegisterClick = { navController.navigate(Screen.Register.route) }
                         )
                     }
 
-                    composable(
-                        route = Screen.Login.route,
-                        enterTransition = { slideInRight() },
-                        popExitTransition = { slideOutRight() }
-                    ) {
+                    composable(route = Screen.Login.route) {
                         LoginScreen(
                             onBackClick = { navController.popBackStack() },
-                            onForgotPasswordClick = {
-                                navController.navigate(Screen.ForgotPassword.route)
-                            },
+                            onForgotPasswordClick = { navController.navigate(Screen.ForgotPassword.route) },
                             onLoginSuccess = {
                                 navController.navigate(Screen.Books.route) {
                                     popUpTo(Screen.Main.route) { inclusive = true }
@@ -109,11 +128,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    composable(
-                        route = Screen.Register.route,
-                        enterTransition = { slideInRight() },
-                        popExitTransition = { slideOutRight() }
-                    ) {
+                    composable(route = Screen.Register.route) {
                         RegisterScreen(
                             onBackClick = { navController.popBackStack() },
                             onRegisterSuccess = {
@@ -123,67 +138,52 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = Screen.OnboardingTime.route,
-                        enterTransition = { slideInRight() },
-                        popExitTransition = { slideOutRight() }
+                        route = Screen.Books.route
                     ) {
-                        OnboardingTimeScreen(
-                            onNext = {
-                                navController.navigate(Screen.OnboardingGenre.route)
-                            }
-                        )
-                    }
-
-                    composable(
-                        route = Screen.OnboardingGenre.route,
-                        enterTransition = { slideInRight() },
-                        popExitTransition = { slideOutRight() }
-                    ) {
-                        OnboardingGenreScreen(
-                            onFinish = {
-                                navController.navigate(Screen.ComingSoon.route)
-                            }
-                        )
-                    }
-
-                    composable(
-                        route = Screen.ForgotPassword.route,
-                        popExitTransition = { slideOutRight() }
-                    ) {
-                        ForgotPasswordScreen(
-                            onBackClick = { navController.popBackStack() }
-                        )
-                    }
-
-                    composable(
-                        route = Screen.ComingSoon.route
-                    ) {
-                        ComingSoonScreen(
-                            onBackClick = { navController.popBackStack() }
-                        )
-                    }
-
-                    composable(Screen.Books.route) {
                         BooksView(
                             onAddClick = { navController.navigate(Screen.NewBook.route) },
+                            onBookClick = { bookId -> 
+                                navController.navigate(Screen.BookDetail.createRoute(bookId))
+                            },
                             onBottomNavClick = onBottomNavItemSelected
                         )
                     }
 
+                    composable(
+                        route = Screen.BookDetail.route,
+                        arguments = listOf(navArgument("bookId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
+                        BookDetailView(
+                            bookId = bookId,
+                            onBackClick = { navController.popBackStack() },
+                            onReadClick = { id -> 
+                                navController.navigate(Screen.PdfReader.createRoute(id))
+                            }
+                        )
+                    }
 
-                    composable(Screen.Settings.route) {
+                    composable(
+                        route = Screen.PdfReader.route,
+                        arguments = listOf(navArgument("bookId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
+                        PdfReaderView(
+                            bookId = bookId,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Settings.route
+                    ) {
                         SettingsView(
                             onBackClick = { navController.popBackStack() },
-                            onEditProfileClick = {
-                                navController.navigate(Screen.EditProfile.route)
-                            },
-                            onReadingSettingsClick = {
-                                navController.navigate(Screen.ReadingSettings.route)
-                            },
+                            onEditProfileClick = { navController.navigate(Screen.EditProfile.route) },
+                            onChangePasswordClick = { navController.navigate(Screen.ChangePassword.route) },
+                            onReadingSettingsClick = { navController.navigate(Screen.ReadingSettings.route) },
                             onLogoutClick = {
-                                navController.navigate(Screen.Main.route) {
-                                    popUpTo(Screen.Main.route) { inclusive = true }
-                                }
+                                // El signOut() lo hace el ViewModel, el listener de arriba redirige
                             },
                             onBottomNavClick = onBottomNavItemSelected
                         )
@@ -193,6 +193,12 @@ class MainActivity : ComponentActivity() {
                         EditProfileView(
                             onBackClick = { navController.popBackStack() },
                             onBottomNavClick = onBottomNavItemSelected
+                        )
+                    }
+
+                    composable(Screen.ChangePassword.route) {
+                        ChangePasswordView(
+                            onBackClick = { navController.popBackStack() }
                         )
                     }
 
@@ -214,7 +220,7 @@ class MainActivity : ComponentActivity() {
 
                     composable(Screen.NewEbook.route) {
                         AddBookScreen(
-                            userId = userId ?: "",
+                            userId = currentUser?.uid ?: "",
                             onBackClick = { navController.popBackStack() },
                             onBottomNavClick = onBottomNavItemSelected
                         )
@@ -224,6 +230,43 @@ class MainActivity : ComponentActivity() {
                         SearchBookView(
                             navController = navController,
                             onBottomNavClick = onBottomNavItemSelected
+                        )
+                    }
+
+                    composable(Screen.FavoriteBooks.route) {
+                        FavoriteBooksView(
+                            onBackClick = { navController.popBackStack() },
+                            onBookClick = { bookId -> 
+                                navController.navigate(Screen.BookDetail.createRoute(bookId))
+                            }
+                        )
+                    }
+
+                    composable(Screen.ComingSoon.route) {
+                        ComingSoonScreen(
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Screen.OnboardingTime.route) {
+                        OnboardingTimeScreen(
+                            onNext = { navController.navigate(Screen.OnboardingGenre.route) }
+                        )
+                    }
+
+                    composable(Screen.OnboardingGenre.route) {
+                        OnboardingGenreScreen(
+                            onFinish = {
+                                navController.navigate(Screen.Books.route) {
+                                    popUpTo(Screen.Main.route) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable(Screen.ForgotPassword.route) {
+                        ForgotPasswordScreen(
+                            onBackClick = { navController.popBackStack() }
                         )
                     }
 
@@ -242,7 +285,6 @@ class MainActivity : ComponentActivity() {
                         val title = backStackEntry.arguments?.getString("title") ?: ""
                         val author = backStackEntry.arguments?.getString("author") ?: ""
                         val date = backStackEntry.arguments?.getString("date") ?: ""
-
                         val encodedUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
                         val imageUrl = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
 
@@ -267,24 +309,24 @@ class MainActivity : ComponentActivity() {
 
 fun slideInRight(): EnterTransition =
     slideInHorizontally(
-        animationSpec = tween(400),
+        animationSpec = tween(500, easing = FastOutSlowInEasing),
         initialOffsetX = { it }
-    )
+    ) + fadeIn(animationSpec = tween(500))
 
 fun slideOutLeft(): ExitTransition =
     slideOutHorizontally(
-        animationSpec = tween(400),
-        targetOffsetX = { -it / 2 }
-    )
+        animationSpec = tween(500, easing = FastOutSlowInEasing),
+        targetOffsetX = { -it / 3 }
+    ) + fadeOut(animationSpec = tween(500))
 
 fun slideInLeft(): EnterTransition =
     slideInHorizontally(
-        animationSpec = tween(400),
-        initialOffsetX = { -it }
-    )
+        animationSpec = tween(500, easing = FastOutSlowInEasing),
+        initialOffsetX = { -it / 3 }
+    ) + fadeIn(animationSpec = tween(500))
 
 fun slideOutRight(): ExitTransition =
     slideOutHorizontally(
-        animationSpec = tween(400),
-        targetOffsetX = { it / 2 }
-    )
+        animationSpec = tween(500, easing = FastOutSlowInEasing),
+        targetOffsetX = { it }
+    ) + fadeOut(animationSpec = tween(500))

@@ -10,7 +10,9 @@ import androidx.compose.material.icons.filled.ImportContacts
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SdCard
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,17 +23,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.example.booktime.tadeo.R
-import com.example.booktime.tadeo.components.BooktimeBottomNav
-import com.example.booktime.tadeo.components.BooktimeButton
-import com.example.booktime.tadeo.components.ScreenWrapper
-import com.example.booktime.tadeo.components.SettingsCard
-import com.example.booktime.tadeo.components.SettingsItem
-import com.example.booktime.tadeo.components.SettingsSectionTitle
-import com.example.booktime.tadeo.components.SettingsSwitchItem
+import com.example.booktime.tadeo.components.*
 import com.example.booktime.tadeo.ui.theme.BooktimeTheme
 import com.example.booktime.tadeo.ui.theme.PrincipalMenu
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.booktime.tadeo.viewmodels.SettingsViewModel
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.background
+import com.example.booktime.tadeo.ui.theme.ButtonGreen
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,14 +49,104 @@ fun SettingsView(
     onBottomNavClick: (Int) -> Unit = {},
     viewModel: SettingsViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val darkModeEnabled by viewModel.darkModeEnabled
     val readingReminders by viewModel.readingReminders
+    val reminderFrequency by viewModel.reminderFrequency
+    val reminderTime by viewModel.reminderTime
+    val reminderDayOfWeek by viewModel.reminderDayOfWeek
+    val downloadLocation by viewModel.downloadLocation
+    val showDialog by viewModel.showDialog
+
+    // Cargar ajustes al entrar
+    LaunchedEffect(Unit) {
+        viewModel.loadSettings()
+    }
+
+    var showFrequencyMenu by remember { mutableStateOf(false) }
+    var showDayMenu by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
+    // Launcher para permiso de notificaciones (Android 13+)
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            viewModel.toggleReadingReminders(false)
+        }
+    }
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = reminderTime.split(":")[0].toIntOrNull() ?: 20,
+        initialMinute = reminderTime.split(":")[1].toIntOrNull() ?: 0,
+        is24Hour = true
+    )
+
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val formattedTime = String.format("%02d:%02d", timePickerState.hour, timePickerState.minute)
+                    viewModel.setReminderTime(formattedTime)
+                    showTimePicker = false
+                }) {
+                    Text("Confirmar", color = ButtonGreen)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) {
+                    Text("Cancelar", color = Color.White)
+                }
+            },
+            containerColor = PrincipalMenu,
+            title = { Text("Seleccionar hora", color = Color.White) },
+            text = {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    TimePicker(
+                        state = timePickerState,
+                        colors = TimePickerDefaults.colors(
+                            clockDialColor = Color.White.copy(alpha = 0.1f),
+                            selectorColor = ButtonGreen,
+                            containerColor = PrincipalMenu,
+                            periodSelectorSelectedContainerColor = ButtonGreen,
+                            periodSelectorUnselectedContainerColor = Color.Transparent,
+                            timeSelectorSelectedContainerColor = ButtonGreen.copy(alpha = 0.2f),
+                            timeSelectorUnselectedContainerColor = Color.White.copy(alpha = 0.1f),
+                            timeSelectorSelectedContentColor = Color.White,
+                            timeSelectorUnselectedContentColor = Color.White
+                        )
+                    )
+                }
+            }
+        )
+    }
+
+    // Launcher para seleccionar carpeta de descarga
+    val directoryPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            viewModel.setDownloadLocation(it.toString())
+        }
+    }
+
+    if (showDialog != null) {
+        AnimatedDialog(
+            title = "Ajustes",
+            text = showDialog!!,
+            onDismiss = { viewModel.dismissDialog() }
+        )
+    }
 
     Scaffold(
         bottomBar = { BooktimeBottomNav(selectedItem = 4, onItemSelected = onBottomNavClick) },
         containerColor = PrincipalMenu
     ) { padding ->
-        ScreenWrapper(onBackClick = onBackClick) {
+        ScreenWrapper(
+            onBackClick = onBackClick,
+            verticalArrangement = Arrangement.Top
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -104,13 +199,15 @@ fun SettingsView(
                     SettingsItem(
                         icon = Icons.Default.DeleteSweep,
                         title = stringResource(id = R.string.clear_cache),
-                        subtitle = stringResource(id = R.string.clear_cache_subtitle)
+                        subtitle = stringResource(id = R.string.clear_cache_subtitle),
+                        onClick = { viewModel.clearCache(context) }
                     )
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
                     SettingsItem(
                         icon = Icons.Default.SdCard,
                         title = stringResource(id = R.string.download_location),
-                        subtitle = stringResource(id = R.string.download_location_subtitle)
+                        subtitle = downloadLocation,
+                        onClick = { directoryPickerLauncher.launch(null) }
                     )
                 }
 
@@ -123,8 +220,94 @@ fun SettingsView(
                         icon = Icons.Default.NotificationsActive,
                         title = stringResource(id = R.string.reading_reminders),
                         checked = readingReminders,
-                        onCheckedChange = { viewModel.toggleReadingReminders(it) }
+                        onCheckedChange = { enabled ->
+                            if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                            viewModel.toggleReadingReminders(enabled)
+                        }
                     )
+                    
+                    if (readingReminders) {
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+                        
+                        // Frecuencia
+                        Box {
+                            SettingsItem(
+                                icon = Icons.Default.Schedule,
+                                title = stringResource(id = R.string.reminder_frequency_label),
+                                subtitle = reminderFrequency,
+                                onClick = { showFrequencyMenu = true }
+                            )
+                            DropdownMenu(
+                                expanded = showFrequencyMenu,
+                                onDismissRequest = { showFrequencyMenu = false },
+                                modifier = Modifier.background(PrincipalMenu)
+                            ) {
+                                val frequencies = listOf(
+                                    stringResource(id = R.string.reminder_frequency_daily),
+                                    stringResource(id = R.string.reminder_frequency_weekly),
+                                    stringResource(id = R.string.reminder_frequency_custom)
+                                )
+                                frequencies.forEach { freq ->
+                                    DropdownMenuItem(
+                                        text = { Text(freq, color = Color.White) },
+                                        onClick = {
+                                            viewModel.setReminderFrequency(freq)
+                                            showFrequencyMenu = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+
+                        // Día de la semana (Solo si es Semanalmente)
+                        if (reminderFrequency == stringResource(id = R.string.reminder_frequency_weekly)) {
+                            Box {
+                                SettingsItem(
+                                    icon = Icons.Default.Schedule,
+                                    title = stringResource(id = R.string.reminder_day_label),
+                                    subtitle = reminderDayOfWeek,
+                                    onClick = { showDayMenu = true }
+                                )
+                                DropdownMenu(
+                                    expanded = showDayMenu,
+                                    onDismissRequest = { showDayMenu = false },
+                                    modifier = Modifier.background(PrincipalMenu)
+                                ) {
+                                    val days = listOf(
+                                        stringResource(id = R.string.day_monday),
+                                        stringResource(id = R.string.day_tuesday),
+                                        stringResource(id = R.string.day_wednesday),
+                                        stringResource(id = R.string.day_thursday),
+                                        stringResource(id = R.string.day_friday),
+                                        stringResource(id = R.string.day_saturday),
+                                        stringResource(id = R.string.day_sunday)
+                                    )
+                                    days.forEach { day ->
+                                        DropdownMenuItem(
+                                            text = { Text(day, color = Color.White) },
+                                            onClick = {
+                                                viewModel.setReminderDayOfWeek(day)
+                                                showDayMenu = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            HorizontalDivider(color = Color.White.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+                        }
+
+                        // Hora
+                        SettingsItem(
+                            icon = Icons.Default.Timer,
+                            title = stringResource(id = R.string.reminder_time_label),
+                            subtitle = reminderTime,
+                            onClick = { showTimePicker = true }
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Booktimetadeo</string>
+    <string name="app_name">BookTime</string>
 
     <!-- General -->
     <string name="back">Volver</string>
@@ -40,7 +40,7 @@
     <string name="edit_profile">Editar Perfil</string>
     <string name="edit_profile_subtitle">Nombre y correo</string>
     <string name="privacy_security">Privacidad y Seguridad</string>
-    <string name="privacy_security_subtitle">Cambiar contraseña y biometría</string>
+    <string name="privacy_security_subtitle">Cambiar la contraseña</string>
     <string name="reading_prefs_section">Preferencias de Lectura</string>
     <string name="dark_mode">Modo Oscuro</string>
     <string name="reading_style">Estilo de Lectura</string>
@@ -162,4 +162,19 @@
     <string name="reading_progress_label">Progreso: %1$d%%</string>
     <string name="book_quote">Abrir un libro es abrir un universo.\n¿Te atreves a explorarlo?</string>
     <string name="ok_button">Entendido</string>
+
+    <!-- Reminders -->
+    <string name="reminder_frequency_label">Frecuencia de Recordatorios</string>
+    <string name="reminder_frequency_daily">Diariamente</string>
+    <string name="reminder_frequency_weekly">Semanalmente</string>
+    <string name="reminder_frequency_custom">Personalizado</string>
+    <string name="reminder_time_label">Hora del recordatorio</string>
+    <string name="reminder_day_label">Día de la semana</string>
+    <string name="day_monday">Lunes</string>
+    <string name="day_tuesday">Martes</string>
+    <string name="day_wednesday">Miércoles</string>
+    <string name="day_thursday">Jueves</string>
+    <string name="day_friday">Viernes</string>
+    <string name="day_saturday">Sábado</string>
+    <string name="day_sunday">Domingo</string>
 </resources>

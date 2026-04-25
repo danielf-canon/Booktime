@@ -40,7 +40,10 @@ fun BooktimeTextField(
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    enabled: Boolean = true,
+    singleLine: Boolean = true,
+    maxLines: Int = 1
 ) {
     OutlinedTextField(
         value = value,
@@ -51,6 +54,9 @@ fun BooktimeTextField(
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
+        enabled = enabled,
+        singleLine = singleLine,
+        maxLines = maxLines,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = FillRectangle,
             unfocusedContainerColor = FillRectangle,
@@ -104,34 +110,40 @@ fun BooktimeButton(
 @Composable
 fun ScreenWrapper(
     onBackClick: (() -> Unit)? = null,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Center,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(PrincipalMenu)
+            .statusBarsPadding()
     ) {
         if (onBackClick != null) {
-            IconButton(
-                onClick = onBackClick,
+            Box(
                 modifier = Modifier
-                    .padding(top = 48.dp, start = 16.dp)
-                    .align(Alignment.TopStart)
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back),
-                    tint = AppWhite
-                )
+                IconButton(
+                    onClick = onBackClick
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back),
+                        tint = AppWhite
+                    )
+                }
             }
         }
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .fillMaxWidth()
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = verticalArrangement,
             content = content
         )
     }

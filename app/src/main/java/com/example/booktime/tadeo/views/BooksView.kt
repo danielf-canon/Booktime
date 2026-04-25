@@ -33,16 +33,18 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun BooksView(
     onAddClick: () -> Unit = {},
+    onBookClick: (String) -> Unit = {}, // Added onBookClick
     onBottomNavClick: (Int) -> Unit
 ) {
-    val repository = remember { GoogleBooksRepository() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val repository = remember { com.example.booktime.tadeo.data.repository.BookRepository() }
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     var books by remember { mutableStateOf<List<Book>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(userId) {
         userId?.let { uid ->
-            books = repository.getUserLibrary(uid)
+            books = repository.getUserLibrary(context, uid)
             isLoading = false
         }
     }
@@ -91,7 +93,7 @@ fun BooksView(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(books) { book ->
-                        BookItem(book)
+                        BookItem(book, onClick = { onBookClick(book.id) })
                     }
                 }
             }
@@ -100,12 +102,12 @@ fun BooksView(
 }
 
 @Composable
-fun BookItem(book: Book) {
+fun BookItem(book: Book, onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(260.dp)
-            .clickable { /* Abrir Lector */ },
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = OtherMenuBackground)
     ) {

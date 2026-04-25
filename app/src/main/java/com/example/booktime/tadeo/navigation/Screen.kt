@@ -13,6 +13,7 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object EditProfile : Screen("edit_profile")
     object ReadingSettings : Screen("reading_settings")
+    object ChangePassword : Screen("change_password")
     object NewBook : Screen("add_books")
     object NewEbook : Screen("add_ebooks")
 
@@ -21,6 +22,13 @@ sealed class Screen(val route: String) {
     object BookAddedSuccess : Screen("book_added_success")
 
     object FavoriteBooks : Screen("favorite_books")
+    object PdfReader : Screen("pdf_reader/{bookId}") {
+        fun createRoute(bookId: String) = "pdf_reader/$bookId"
+    }
+
+    object BookDetail : Screen("book_detail/{bookId}") {
+        fun createRoute(bookId: String) = "book_detail/$bookId"
+    }
 
 
 
@@ -38,6 +46,7 @@ sealed class Screen(val route: String) {
                 Settings.route,
                 EditProfile.route,
                 ReadingSettings.route,
+                ChangePassword.route,
                 NewBook.route,
                 NewEbook.route
             )

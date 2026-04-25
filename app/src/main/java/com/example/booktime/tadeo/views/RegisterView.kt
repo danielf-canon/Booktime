@@ -15,29 +15,38 @@ import com.example.booktime.tadeo.components.BooktimeTextField
 import com.example.booktime.tadeo.components.ScreenWrapper
 import com.example.booktime.tadeo.utils.ValidationUtils
 
-@Composable
-fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
-    val auth = FirebaseAuth.getInstance()
-    val context = androidx.compose.ui.platform.LocalContext.current
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.booktime.tadeo.viewmodels.AuthViewModel
 
+@Composable
+fun RegisterScreen(
+    onBackClick: () -> Unit,
+    onRegisterSuccess: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
+) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+    
+    val isLoading by viewModel.isLoading
+    val errorMessage by viewModel.errorMessage
+    val successMessage by viewModel.successMessage
 
     val errorEmptyFields = stringResource(id = R.string.error_empty_fields)
     val errorInvalidEmail = stringResource(id = R.string.error_invalid_email)
     val errorPasswordRules = stringResource(id = R.string.error_password_rules)
     val errorPasswordsDontMatch = stringResource(id = R.string.error_passwords_dont_match)
 
-    if (showErrorDialog) {
+    if (errorMessage != null || successMessage != null) {
         AnimatedDialog(
-            title = stringResource(id = R.string.error_title),
-            text = errorMessage,
-            onDismiss = { showErrorDialog = false }
+            title = if (errorMessage != null) stringResource(id = R.string.error_title) else "Éxito",
+            text = errorMessage ?: successMessage!!,
+            onDismiss = { 
+                val wasSuccess = successMessage != null
+                viewModel.clearError()
+                if (wasSuccess) onBackClick() // Redirigir al Login/Inicio tras éxito
+            }
         )
     }
 
@@ -83,40 +92,17 @@ fun RegisterScreen(onBackClick: () -> Unit, onRegisterSuccess: () -> Unit) {
             text = stringResource(id = R.string.register_button),
             isLoading = isLoading,
             onClick = {
-                if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
-                    errorMessage = errorEmptyFields
-                    showErrorDialog = true
-                } else if (!ValidationUtils.isValidEmail(email)) {
-                    errorMessage = errorInvalidEmail
-                    showErrorDialog = true
-                } else if (!ValidationUtils.isValidPassword(password)) {
-                    errorMessage = errorPasswordRules
-                    showErrorDialog = true
-                } else if (!ValidationUtils.passwordsMatch(password, confirmPassword)) {
-                    errorMessage = errorPasswordsDontMatch
-                    showErrorDialog = true
-                } else {
-                    isLoading = true
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            isLoading = false
-                            if (task.isSuccessful) {
-                                val user = auth.currentUser
-                                val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                                    .setDisplayName(name)
-                                    .build()
-                                user?.updateProfile(profileUpdates)
-                                onRegisterSuccess()
-                            } else {
-                                val exception = task.exception
-                                errorMessage = when (exception) {
-                                    is com.google.firebase.auth.FirebaseAuthUserCollisionException -> "Este correo ya está registrado."
-                                    else -> "Error al registrar: ${exception?.message}"
-                                }
-                                showErrorDialog = true
-                            }
-                        }
-                }
+                viewModel.register(
+                    name = name,
+                    email = email.trim(),
+                    password = password,
+                    confirmPassword = confirmPassword,
+                    errorEmptyFields = errorEmptyFields,
+                    errorInvalidEmail = errorInvalidEmail,
+                    errorPasswordRules = errorPasswordRules,
+                    errorPasswordsDontMatch = errorPasswordsDontMatch,
+                    onSuccess = onRegisterSuccess
+                )
             }
         )
     }

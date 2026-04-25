@@ -18,7 +18,8 @@ fun MainMenu(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PrincipalMenu),
+            .background(PrincipalMenu)
+            .statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         Column(

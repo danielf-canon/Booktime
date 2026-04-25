@@ -19,7 +19,8 @@ fun ComingSoonScreen(onBackClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF4A5A6E)),
+            .background(Color(0xFF4A5A6E))
+            .statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         IconButton(

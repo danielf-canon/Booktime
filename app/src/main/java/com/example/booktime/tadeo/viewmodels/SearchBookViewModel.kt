@@ -2,17 +2,28 @@ package com.example.booktime.tadeo.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.*
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.example.booktime.tadeo.data.model.Book
 import com.example.booktime.tadeo.data.model.GoogleBookItem
 import com.example.booktime.tadeo.data.repository.GoogleBooksRepository
+import com.example.booktime.tadeo.data.repository.BookRepository
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.example.booktime.tadeo.R
 
-class SearchBookViewModel : ViewModel() {
+class SearchBookViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = GoogleBooksRepository()
+    private val bookRepository = BookRepository()
+    private val auth = FirebaseAuth.getInstance()
+    
+    private fun getPrefs(): android.content.SharedPreferences {
+        val uid = auth.currentUser?.uid ?: "guest"
+        return getApplication<Application>().getSharedPreferences("booktime_settings_$uid", Context.MODE_PRIVATE)
+    }
 
     var query by mutableStateOf("")
     var results by mutableStateOf<List<GoogleBookItem>>(emptyList())
@@ -53,7 +64,17 @@ class SearchBookViewModel : ViewModel() {
             )
 
             try {
-                repository.saveBookToFirebase(userId, newBook)
+                // 1. Guardar en SharedPreferences (antes Firebase Mock)
+                repository.saveBookToFirebase(getApplication(), userId, newBook)
+                
+                // 2. "Descargar" libro en la ubicación configurada
+                val downloadPath = getPrefs().getString("download_location", "Almacenamiento interno") ?: "Almacenamiento interno"
+                bookRepository.downloadGoogleBook(
+                    bookId = newBook.id,
+                    title = newBook.title,
+                    location = downloadPath
+                )
+                
                 onSuccess(newBook)
             } catch (e: Exception) {
                 Log.e("SAVE_ERROR", e.message.toString())

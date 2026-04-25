@@ -8,4 +8,7 @@ data class Book(
     val imageUrl: String = "",
     val addedAt: Timestamp? = null,
     val progress: Int = 0,
+    val fileUri: String = "",
+    val description: String = "",
+    val isFavorite: Boolean = false
 )
