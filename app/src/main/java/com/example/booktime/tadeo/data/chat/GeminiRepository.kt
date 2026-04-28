@@ -1,0 +1,101 @@
+package com.example.booktime.tadeo.data.chat
+
+import com.example.booktime.tadeo.BuildConfig
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Query
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
+
+
+data class GeminiRequest(
+    val contents: List<Content>
+)
+
+data class Content(
+    val parts: List<Part>
+)
+
+data class Part(
+    val text: String
+)
+
+
+data class GeminiResponse(
+    val candidates: List<Candidate>?
+)
+
+data class Candidate(
+    val content: ContentResponse?
+)
+
+data class ContentResponse(
+    val parts: List<PartResponse>?
+)
+
+data class PartResponse(
+    val text: String?
+)
+
+
+interface GeminiApi {
+    @POST("models/gemini-flash-latest:generateContent")
+    suspend fun generateContent(
+        @Query("key") apiKey: String,
+        @Body request: GeminiRequest
+    ): GeminiResponse
+}
+
+
+class GeminiRepository {
+
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .build()
+
+    private val api = Retrofit.Builder()
+        .baseUrl("https://generativelanguage.googleapis.com/v1beta/")
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(GeminiApi::class.java)
+
+
+    suspend fun ask(prompt: String): String {
+        return try {
+
+            println("LLAMANDO A GEMINI...")
+
+            val request = GeminiRequest(
+                contents = listOf(
+                    Content(
+                        parts = listOf(
+                            Part(text = prompt)
+                        )
+                    )
+                )
+            )
+
+            val response = api.generateContent(
+                BuildConfig.GEMINI_API_KEY,
+                request
+            )
+
+            response.candidates
+                ?.firstOrNull()
+                ?.content
+                ?.parts
+                ?.firstOrNull()
+                ?.text
+                ?: "No tengo respuesta "
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return "Error real: ${e.message}"
+        }
+    }
+}

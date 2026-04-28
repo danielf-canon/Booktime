@@ -33,7 +33,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun BooksView(
     onAddClick: () -> Unit = {},
-    onBookClick: (String) -> Unit = {}, // Added onBookClick
+    onBookClick: (String) -> Unit = {},
     onBottomNavClick: (Int) -> Unit
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current

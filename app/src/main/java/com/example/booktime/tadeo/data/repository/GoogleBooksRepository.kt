@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query as ApiQuery
-
+import com.example.booktime.tadeo.BuildConfig
 interface GoogleBooksApi {
     @GET("volumes")
     suspend fun searchBooks(
@@ -21,7 +21,7 @@ interface GoogleBooksApi {
 }
 
 class GoogleBooksRepository {
-    private val API_KEY = ""
+
     private val gson = Gson()
 
     private fun getPrefs(context: Context, userId: String) =
@@ -33,7 +33,8 @@ class GoogleBooksRepository {
         .build()
         .create(GoogleBooksApi::class.java)
 
-    suspend fun search(query: String) = api.searchBooks(query, API_KEY)
+    suspend fun search(query: String, apiKey: String) =
+        api.searchBooks(query, apiKey)
 
     suspend fun saveBookToFirebase(context: Context, userId: String, book: Book) {
         delay(500)

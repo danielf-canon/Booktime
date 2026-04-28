@@ -28,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.runtime.LaunchedEffect
+import com.example.booktime.tadeo.BuildConfig
 
 @Composable
 fun SearchBookView(
@@ -35,6 +37,9 @@ fun SearchBookView(
     onBottomNavClick: (Int) -> Unit = {},
     viewModel: SearchBookViewModel = viewModel()
 ) {
+    LaunchedEffect(Unit) {
+        android.util.Log.d("API_KEY_TEST", "BOOKS_API_KEY: ${BuildConfig.BOOKS_API_KEY}")
+    }
     Scaffold(
         contentWindowInsets = WindowInsets.statusBars,
         bottomBar = { BooktimeBottomNav(selectedItem = 2, onItemSelected = onBottomNavClick) },
@@ -144,3 +149,4 @@ fun InfoLabel(label: String, value: String) {
         Text(value, color = AppWhite, fontSize = 11.sp, maxLines = 1)
     }
 }
+

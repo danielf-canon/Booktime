@@ -14,6 +14,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.example.booktime.tadeo.R
+import com.example.booktime.tadeo.BuildConfig
 
 class SearchBookViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = GoogleBooksRepository()
@@ -37,7 +38,7 @@ class SearchBookViewModel(application: Application) : AndroidViewModel(applicati
             isLoading = true
             selectedBookId = null
             try {
-                val response = repository.search(query)
+                val response = repository.search(query, BuildConfig.BOOKS_API_KEY)
                 results = response.items ?: emptyList()
             } catch (e: Exception) {
                 results = emptyList()
