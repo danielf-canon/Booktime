@@ -28,6 +28,7 @@ import com.example.booktime.tadeo.data.model.Book
 import com.example.booktime.tadeo.data.repository.GoogleBooksRepository
 import com.example.booktime.tadeo.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,11 +42,21 @@ fun BooksView(
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     var books by remember { mutableStateOf<List<Book>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(userId) {
         userId?.let { uid ->
             books = repository.getUserLibrary(context, uid)
             isLoading = false
+        }
+    }
+
+    val onFavoriteToggle: (String) -> Unit = { bookId ->
+        userId?.let { uid ->
+            scope.launch {
+                repository.toggleFavorite(context, uid, bookId)
+                books = repository.getUserLibrary(context, uid)
+            }
         }
     }
 
@@ -93,7 +104,11 @@ fun BooksView(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(books) { book ->
-                        BookItem(book, onClick = { onBookClick(book.id) })
+                        BookItem(
+                            book = book, 
+                            onClick = { onBookClick(book.id) },
+                            onFavoriteToggle = { onFavoriteToggle(book.id) }
+                        )
                     }
                 }
             }
@@ -102,7 +117,11 @@ fun BooksView(
 }
 
 @Composable
-fun BookItem(book: Book, onClick: () -> Unit = {}) {
+fun BookItem(
+    book: Book, 
+    onClick: () -> Unit = {},
+    onFavoriteToggle: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -111,59 +130,74 @@ fun BookItem(book: Book, onClick: () -> Unit = {}) {
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = OtherMenuBackground)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White.copy(alpha = 0.05f)),
-                contentAlignment = Alignment.Center
-            ) {
-                if (book.imageUrl.isNotEmpty()) {
-                    AsyncImage(
-                        model = book.imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Book,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.3f),
-                        modifier = Modifier.size(48.dp)
-                    )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.05f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (book.imageUrl.isNotEmpty()) {
+                        AsyncImage(
+                            model = book.imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Book,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.3f),
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = book.title,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = book.author,
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = 0.7f),
+                    maxLines = 1
+                )
+
+                LinearProgressIndicator(
+                    progress = { book.progress / 100f },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp)),
+                    color = ButtonGreen,
+                    trackColor = Color.White.copy(alpha = 0.2f)
+                )
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = book.title,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 1,
-                textAlign = TextAlign.Center,
-                fontSize = 14.sp
-            )
-            Text(
-                text = book.author,
-                fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.7f),
-                maxLines = 1
-            )
-
-            LinearProgressIndicator(
-                progress = { book.progress / 100f },
+            
+            IconButton(
+                onClick = onFavoriteToggle,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp)),
-                color = ButtonGreen,
-                trackColor = Color.White.copy(alpha = 0.2f)
-            )
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+            ) {
+                Icon(
+                    imageVector = if (book.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorito",
+                    tint = if (book.isFavorite) Color.Red else Color.White
+                )
+            }
         }
     }
 }

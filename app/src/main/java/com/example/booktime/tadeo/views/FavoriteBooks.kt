@@ -19,6 +19,7 @@ import com.example.booktime.tadeo.data.model.Book
 import com.example.booktime.tadeo.data.repository.BookRepository
 import com.example.booktime.tadeo.ui.theme.PrincipalMenu
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,12 +32,28 @@ fun FavoriteBooksView(
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     var favoriteBooks by remember { mutableStateOf<List<Book>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
+
+    fun refreshBooks() {
+        userId?.let { uid ->
+            scope.launch {
+                val library = repository.getUserLibrary(context, uid)
+                favoriteBooks = library.filter { it.isFavorite }
+            }
+        }
+    }
 
     LaunchedEffect(userId) {
+        refreshBooks()
+        isLoading = false
+    }
+
+    val onFavoriteToggle: (String) -> Unit = { bookId ->
         userId?.let { uid ->
-            val library = repository.getUserLibrary(context, uid)
-            favoriteBooks = library.filter { it.isFavorite }
-            isLoading = false
+            scope.launch {
+                repository.toggleFavorite(context, uid, bookId)
+                refreshBooks()
+            }
         }
     }
 
@@ -73,7 +90,11 @@ fun FavoriteBooksView(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(favoriteBooks) { book ->
-                    BookItem(book, onClick = { onBookClick(book.id) })
+                    BookItem(
+                        book = book,
+                        onClick = { onBookClick(book.id) },
+                        onFavoriteToggle = { onFavoriteToggle(book.id) }
+                    )
                 }
             }
         }
