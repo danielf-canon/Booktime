@@ -22,6 +22,8 @@ sealed class Screen(val route: String) {
     object BookAddedSuccess : Screen("book_added_success")
 
     object FavoriteBooks : Screen("favorite_books")
+
+    object Analytics : Screen("analytics")
     object PdfReader : Screen("pdf_reader/{bookId}") {
         fun createRoute(bookId: String) = "pdf_reader/$bookId"
     }
