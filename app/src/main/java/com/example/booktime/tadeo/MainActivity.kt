@@ -28,6 +28,8 @@ import kotlinx.coroutines.delay
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.booktime.tadeo.viewmodels.SettingsViewModel
 
+import com.example.booktime.tadeo.analytics.AnalyticsScreen
+
 @OptIn(ExperimentalAnimationApi::class)
 class MainActivity : ComponentActivity() {
 
@@ -70,15 +72,21 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val onBottomNavItemSelected: (Int) -> Unit = { index ->
-                    when (index) {
-                        0 -> navController.navigate(Screen.Books.route)
-                        1 -> navController.navigate(Screen.ComingSoon.route)
-                        2 -> navController.navigate(Screen.NewBook.route)
-                        3 -> navController.navigate(Screen.FavoriteBooks.route)
-                        4 -> navController.navigate(Screen.Settings.route)
-                    }
-                }
+             val onBottomNavItemSelected: (Int) -> Unit = { index ->
+
+    when (index) {
+
+        0 -> navController.navigate(Screen.Books.route)
+
+        1 -> navController.navigate(Screen.Analytics.route)
+
+        2 -> navController.navigate(Screen.NewBook.route)
+
+        3 -> navController.navigate(Screen.FavoriteBooks.route)
+
+        4 -> navController.navigate(Screen.Settings.route)
+    }
+}
 
                 NavHost(
                     navController = navController,
@@ -238,6 +246,26 @@ class MainActivity : ComponentActivity() {
                             onBackClick = { navController.popBackStack() },
                             onBookClick = { bookId -> 
                                 navController.navigate(Screen.BookDetail.createRoute(bookId))
+                            }
+                        )
+                    }
+
+                    composable(Screen.Analytics.route) {
+                        AnalyticsScreen(
+                            onBottomNavItemSelected = { index ->
+
+                                when (index) {
+
+                                    0 -> navController.navigate(Screen.Books.route)
+
+                                    1 -> navController.navigate(Screen.Analytics.route)
+
+                                    2 -> navController.navigate(Screen.NewBook.route)
+
+                                    3 -> navController.navigate(Screen.FavoriteBooks.route)
+
+                                    4 -> navController.navigate(Screen.Settings.route)
+                                }
                             }
                         )
                     }
