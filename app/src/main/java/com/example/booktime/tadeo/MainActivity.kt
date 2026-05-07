@@ -72,15 +72,21 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val onBottomNavItemSelected: (Int) -> Unit = { index ->
-                    when (index) {
-                        0 -> navController.navigate(Screen.Books.route)
-                        1 -> navController.navigate(Screen.FavoriteBooks.route)
-                        2 -> navController.navigate(Screen.NewBook.route)
-                        3 -> navController.navigate(Screen.Analytics.route)
-                        4 -> navController.navigate(Screen.Settings.route)
-                    }
-                }
+             val onBottomNavItemSelected: (Int) -> Unit = { index ->
+
+    when (index) {
+
+        0 -> navController.navigate(Screen.Books.route)
+
+        1 -> navController.navigate(Screen.Analytics.route)
+
+        2 -> navController.navigate(Screen.NewBook.route)
+
+        3 -> navController.navigate(Screen.FavoriteBooks.route)
+
+        4 -> navController.navigate(Screen.Settings.route)
+    }
+}
 
                 NavHost(
                     navController = navController,
