@@ -96,6 +96,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation("com.patrykandpatrick.vico:compose:1.13.1")
     implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
 
 
