@@ -13,13 +13,15 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import com.example.booktime.tadeo.data.chat.GeminiRepository
 import kotlinx.coroutines.delay
-
+import com.example.booktime.tadeo.data.chat.ChatRepository
+import com.example.booktime.tadeo.data.model.ChatMessage
+import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun ChatBottomSheet(
     bookTitle: String,
     onClose: () -> Unit
 ) {
-    var messages by remember { mutableStateOf(listOf<String>()) }
+    var messages by remember { mutableStateOf(listOf<ChatMessage>()) }
     var text by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var lastRequestTime by remember { mutableStateOf(0L) }
@@ -28,6 +30,14 @@ fun ChatBottomSheet(
 
     val scope = rememberCoroutineScope()
     val gemini = remember { GeminiRepository() }
+    val chatRepository = remember { ChatRepository() }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
+    LaunchedEffect(Unit) {
+
+        chatRepository.loadMessages(userId, bookTitle) {
+            messages = it
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -51,8 +61,16 @@ fun ChatBottomSheet(
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
-                items(messages) {
-                    Text(it, color = Color.Black)
+                items(messages) { message ->
+
+                    val prefix =
+                        if (message.sender == "user") "Tú: "
+                        else "IA: "
+
+                    Text(
+                        text = prefix + message.text,
+                        color = Color.Black
+                    )
                 }
             }
 
@@ -69,7 +87,10 @@ fun ChatBottomSheet(
                                 val currentTime = System.currentTimeMillis()
 
                                 if (currentTime - lastRequestTime < 5000) {
-                                    messages = messages + "Sistema: Espera unos segundos antes de volver a preguntar"
+                                    messages = messages + ChatMessage(
+                                        "Espera unos segundos antes de volver a preguntar",
+                                        "ai"
+                                    )
                                     return@launch
                                 }
 
@@ -80,12 +101,37 @@ fun ChatBottomSheet(
 
                                 delay(3000)
 
-                                val fullPrompt =
-                                    "Explícame el libro '$bookTitle'. Pregunta: $prompt"
+                                val fullPrompt = """
+                                    Eres una inteligencia artificial especializada únicamente en libros.
+
+                                        Libro actual: "$bookTitle"
+
+                                    INSTRUCCIONES IMPORTANTES:
+                                    - Solo puedes responder preguntas relacionadas con este libro.
+                                    - Si el usuario pregunta algo fuera del libro responde EXACTAMENTE:
+                                "No tengo contexto para responder eso. Solo puedo ayudarte con preguntas relacionadas con el libro."
+
+                                    - No respondas preguntas generales.
+                                    - No respondas temas de programación, deportes, chistes o actualidad.
+                                    - Responde máximo en 5 líneas.
+                                    - Sé claro y breve.
+                                        - No inventes información.
+
+                                     Pregunta del usuario:
+                                        $prompt
+                                        """.trimIndent()
+
+                                chatRepository.saveMessage(
+                                    userId,
+                                    bookTitle,
+                                    ChatMessage(prompt, "user")
+                                )
 
                                 val response = gemini.ask(fullPrompt)
 
-                                messages = messages + "Tú: $prompt" + "IA: $response"
+                                messages = messages +
+                                        ChatMessage(prompt, "user") +
+                                        ChatMessage(response, "ai")
 
                                 isLoading = false
                             }
@@ -115,7 +161,10 @@ fun ChatBottomSheet(
                             val currentTime = System.currentTimeMillis()
 
                             if (currentTime - lastRequestTime < 8000) {
-                                messages = messages + "Sistema: Espera unos segundos antes de volver a preguntar"
+                                messages = messages + ChatMessage(
+                                    "Espera unos segundos antes de volver a preguntar",
+                                    "ai"
+                                )
                                 return@launch
                             }
 
@@ -126,13 +175,36 @@ fun ChatBottomSheet(
 
                             delay(3000)
 
-                            val fullPrompt =
-                                "Sobre el libro '$bookTitle': $text"
+                            val fullPrompt = """
+                                Eres una inteligencia artificial especializada únicamente en libros.
 
+                                Libro actual: "$bookTitle"
+
+                                INSTRUCCIONES IMPORTANTES:
+                                - Solo puedes responder preguntas relacionadas con este libro.
+                                - Si el usuario pregunta algo fuera del libro responde EXACTAMENTE:
+                                "No tengo contexto para responder eso. Solo puedo ayudarte con preguntas relacionadas con el libro."
+
+                                - No respondas preguntas generales.
+                                - No respondas temas de programación, deportes, chistes o actualidad.
+                                - Responde máximo en 5 líneas.
+                                - Sé claro y breve.
+                                - No inventes información.
+
+                                Pregunta del usuario:
+                                $text
+                                """.trimIndent()
                             val response = gemini.ask(fullPrompt)
 
-                            messages = messages + "Tú: $text" + "IA: $response"
-                            text = ""
+                            chatRepository.saveMessage(
+                                userId,
+                                bookTitle,
+                                ChatMessage(response, "ai")
+                            )
+
+                            messages = messages +
+                                    ChatMessage(text, "user") +
+                                    ChatMessage(response, "ai")
 
                             isLoading = false
                         }

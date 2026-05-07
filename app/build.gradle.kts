@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.coil.compose)
     implementation(libs.androidx.ui)
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
 
 
