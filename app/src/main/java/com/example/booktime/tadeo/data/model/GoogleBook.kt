@@ -6,17 +6,23 @@ data class GoogleBooksResponse(
     @SerializedName("items") val items: List<GoogleBookItem>?
 )
 
-data class GoogleBookItem(
-    @SerializedName("id") val id: String,
-    @SerializedName("volumeInfo") val volumeInfo: GoogleVolumeInfo
-)
-
 data class GoogleVolumeInfo(
     @SerializedName("title") val title: String,
     @SerializedName("authors") val authors: List<String>?,
     @SerializedName("description") val description: String?,
     @SerializedName("categories") val categories: List<String>?,
-    @SerializedName("imageLinks") val imageLinks: GoogleImageLinks?
+    @SerializedName("imageLinks") val imageLinks: GoogleImageLinks?,
+    @SerializedName("previewLink") val previewLink: String?
+)
+
+data class GoogleBookItem(
+    @SerializedName("id") val id: String,
+    @SerializedName("volumeInfo") val volumeInfo: GoogleVolumeInfo,
+    @SerializedName("accessInfo") val accessInfo: GoogleAccessInfo?
+)
+
+data class GoogleAccessInfo(
+    @SerializedName("webReaderLink") val webReaderLink: String?
 )
 
 data class GoogleImageLinks(
