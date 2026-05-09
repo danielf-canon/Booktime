@@ -94,15 +94,15 @@ fun BookDetailView(
                                 scope.launch {
                                     val result = repository.toggleFavorite(context, uid, b.id)
                                     if (result.isSuccess) {
-                                        book = b.copy(isFavorite = result.getOrThrow())
+                                        book = b.copy(favorite = result.getOrThrow())
                                     }
                                 }
                             }
                         }) {
                             Icon(
-                                imageVector = if (b.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                imageVector = if (b.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "Favorito",
-                                tint = if (b.isFavorite) Color.Red else Color.White
+                                tint = if (b.favorite) Color.Red else Color.White
                             )
                         }
                     }

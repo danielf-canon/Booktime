@@ -1,14 +1,27 @@
 package com.example.booktime.tadeo.data.model
 
 import com.google.firebase.Timestamp
+
 data class Book(
-    val id: String = "",
-    val title: String = "",
-    val author: String = "",
-    val imageUrl: String = "",
-    val addedAt: Timestamp? = null,
-    val progress: Int = 0,
-    val fileUri: String = "",
-    val description: String = "",
-    val isFavorite: Boolean = false
-)
+    var id: String = "",
+    var title: String = "",
+    var author: String = "",
+    var imageUrl: String = "",
+    var addedAt: Timestamp? = null,
+    var progress: Int = 0,
+    var fileUri: String = "",
+    var description: String = "",
+    var favorite: Boolean = false
+) {
+    constructor() : this(
+        "",
+        "",
+        "",
+        "",
+        null,
+        0,
+        "",
+        "",
+        false
+    )
+}

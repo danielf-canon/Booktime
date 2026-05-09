@@ -49,7 +49,7 @@ fun FavoriteBooksView(
     LaunchedEffect(userId) {
         userId?.let { uid ->
             val library = repository.getUserLibrary(context, uid)
-            favoriteBooks = library.filter { it.isFavorite }
+            favoriteBooks = library.filter { it.favorite }
             isLoading = false
         }
     }

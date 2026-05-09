@@ -61,20 +61,23 @@ class SearchBookViewModel(application: Application) : AndroidViewModel(applicati
                 author = selectedItem.volumeInfo.authors?.joinToString() ?: "Desconocido",
                 imageUrl = selectedItem.volumeInfo.imageLinks?.httpsThumbnail ?: "",
                 addedAt = Timestamp.now(),
-                progress = 0
-            )
+                progress = 0,
 
+                fileUri =
+                    selectedItem.accessInfo?.webReaderLink
+                        ?: selectedItem.volumeInfo.previewLink
+                        ?: "",
+
+                description =
+                    selectedItem.volumeInfo.description
+                        ?: "Sin descripción disponible"
+            )
             try {
                 // 1. Guardar en SharedPreferences (antes Firebase Mock)
                 repository.saveBookToFirebase(getApplication(), userId, newBook)
                 
-                // 2. "Descargar" libro en la ubicación configurada
-                val downloadPath = getPrefs().getString("download_location", "Almacenamiento interno") ?: "Almacenamiento interno"
-                bookRepository.downloadGoogleBook(
-                    bookId = newBook.id,
-                    title = newBook.title,
-                    location = downloadPath
-                )
+
+
                 
                 onSuccess(newBook)
             } catch (e: Exception) {

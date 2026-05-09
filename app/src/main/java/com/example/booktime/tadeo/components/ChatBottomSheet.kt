@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.background
 import com.example.booktime.tadeo.ui.theme.PrincipalMenu
 import com.example.booktime.tadeo.data.utils.PdfContextHelper
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 @Composable
 fun ChatBottomSheet(
     bookTitle: String,
@@ -74,13 +77,40 @@ fun ChatBottomSheet(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(350.dp)
-                .background(Color(0xFF1E1F2B))
+                .fillMaxHeight(0.92f)
+                .background(Color(0xFF111827))
                 .padding(12.dp)
         ) {
 
-            TextButton(onClick = onClose) {
-                Text("Cerrar")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column {
+
+                    Text(
+                        text = "Teemo AI",
+                        color = Color.White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = bookTitle,
+                        color = Color.LightGray,
+                        fontSize = 13.sp
+                    )
+                }
+
+                TextButton(onClick = onClose) {
+
+                    Text(
+                        "Cerrar",
+                        color = PrincipalMenu
+                    )
+                }
             }
 
             LazyColumn(
@@ -119,7 +149,7 @@ fun ChatBottomSheet(
                                     if (isUser)
                                         PrincipalMenu
                                     else
-                                        Color(0xFF2B2D42)
+                                        Color(0xFF1F2937)
                                 )
                                 .padding(12.dp)
                         ) {
@@ -138,7 +168,7 @@ fun ChatBottomSheet(
                             Text(
                                 text = message.text,
                                 color = Color.White,
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 lineHeight = 22.sp
                             )
                             if (isLoading) {
@@ -169,9 +199,9 @@ fun ChatBottomSheet(
                 prompts.forEach { prompt ->
                     Button(
                         enabled = !isLoading,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(50.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PrincipalMenu
+                                containerColor = Color(0xFF1F2937)
                         ),
                         onClick = {
                             scope.launch {
@@ -295,7 +325,11 @@ $prompt
                             }
                         }
                     ) {
-                        Text(prompt)
+                        Text(
+                            prompt,
+                            color = Color.White,
+                            fontSize = 13.sp
+                        )
                     }
                 }
             }
@@ -312,8 +346,8 @@ $prompt
                         .clip(RoundedCornerShape(16.dp)),
                     enabled = !isLoading,
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF2B2D42),
-                        unfocusedContainerColor = Color(0xFF2B2D42),
+                        focusedContainerColor = Color(0xFF1F2937),
+                        unfocusedContainerColor = Color(0xFF1F2937),
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
                         cursorColor = Color.White,
@@ -330,8 +364,11 @@ $prompt
 
                 Button(
                     enabled = !isLoading,
-                    modifier = Modifier.padding(start = 8.dp),
-                    shape = RoundedCornerShape(16.dp),
+
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .size(54.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PrincipalMenu
                     ),
@@ -475,7 +512,12 @@ PREGUNTA DEL USUARIO:
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Enviar")
+                        Icon(
+                            imageVector = Icons.Default.Send,
+                            contentDescription = "Enviar",
+                            tint = Color.White ,
+                            modifier = Modifier.size(30.dp),
+                        )
                     }
                 }
             }

@@ -32,7 +32,7 @@ class BookRepository {
     ): Result<Unit> {
         return try {
             val bookId = UUID.randomUUID().toString()
-            
+
             // 1. Subir PDF a Firebase Storage
             val pdfRef = storage.reference.child("users/$userId/books/$bookId.pdf")
             pdfRef.putFile(uri).await()
@@ -76,8 +76,18 @@ class BookRepository {
             val snapshot = firestore.collection("users").document(userId)
                 .collection("library")
                 .get().await()
-            
-            snapshot.toObjects(Book::class.java)
+            Log.d("BOOKS_DEBUG", "Documentos encontrados: ${snapshot.documents.size}")
+            snapshot.documents.forEach {
+                Log.d("BOOKS_DEBUG", "DATA: ${it.data}")
+            }
+
+            snapshot.documents.mapNotNull {
+                try {
+                    it.toObject(Book::class.java)
+                } catch (e: Exception) {
+                    null
+                }
+            }
         } catch (e: Exception) {
             Log.e("BookRepository", "Error getting library", e)
             // Fallback al mock si falla (opcional, mejor devolver lista vacía o error)
@@ -85,39 +95,32 @@ class BookRepository {
         }
     }
 
-    suspend fun toggleFavorite(context: Context, userId: String, bookId: String): Result<Boolean> {
-        return try {
-            val prefs = getPrefs(context, userId)
-            val existingBooksJson = prefs.getString("library", "[]")
-            val type = object : TypeToken<List<Book>>() {}.type
-            val books: MutableList<Book> = gson.fromJson(existingBooksJson, type)
-            
-            var newState = false
-            val updatedBooks = books.map { 
-                if (it.id == bookId) {
-                    newState = !it.isFavorite
-                    it.copy(isFavorite = newState)
-                } else it
-            }
-            
-            prefs.edit().putString("library", gson.toJson(updatedBooks)).apply()
-            Result.success(newState)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+    suspend fun toggleFavorite(
+        context: Context,
+        userId: String,
+        bookId: String
+    ): Result<Boolean> {
 
-    suspend fun downloadGoogleBook(
-        bookId: String,
-        title: String,
-        location: String
-    ): Result<String> {
         return try {
-            // Simulamos la descarga de un libro de Google Books
-            delay(2000)
-            Log.d("BookRepository", "Descargando libro $title en: $location")
-            Result.success("Libro descargado en $location/$title.pdf")
+
+            val docRef = firestore.collection("users")
+                .document(userId)
+                .collection("library")
+                .document(bookId)
+
+            val snapshot = docRef.get().await()
+
+            val current =
+                snapshot.getBoolean("favorite") ?: false
+
+            val newState = !current
+
+            docRef.update("favorite", newState).await()
+
+            Result.success(newState)
+
         } catch (e: Exception) {
+
             Result.failure(e)
         }
     }

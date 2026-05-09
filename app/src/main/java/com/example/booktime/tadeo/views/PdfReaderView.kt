@@ -85,33 +85,65 @@ fun PdfReaderView(
             book = library.find { it.id == bookId }
 
             book?.let { b ->
-                val isGooglePreview = b.fileUri.contains("books.google.com")
-                val isRemotePdf = b.fileUri.startsWith("http") && (b.fileUri.contains(".pdf") || b.fileUri.contains("firebasestorage"))
 
-                if (isGooglePreview) {
-                    isLoading = false
-                } else if (isRemotePdf) {
-                    downloadAndLoadPdf(context, b.fileUri) { pages, text, error ->
-                        pdfPages = pages
-                        pdfContext = text
-                        errorMessage = error
+                val isGooglePreview =
+                    b.fileUri.contains("google.com")
+
+                val isRemotePdf =
+                    b.fileUri.contains(".pdf") ||
+                            b.fileUri.contains("firebasestorage")
+
+                when {
+
+                    isGooglePreview -> {
                         isLoading = false
                     }
-                } else if (b.fileUri.isNotEmpty()) {
-                    loadPdfPages(context, b.fileUri.toUri()) { pages, error ->
-                        pdfPages = pages
-                        pdfContext = PdfTextExtractor.extractText(
+
+                    isRemotePdf -> {
+
+                        downloadAndLoadPdf(
+                            context,
+                            b.fileUri
+                        ) { pages, text, error ->
+
+                            pdfPages = pages
+                            pdfContext = text
+                            errorMessage = error
+                            isLoading = false
+                        }
+                    }
+
+                    b.fileUri.isNotEmpty() -> {
+
+                        loadPdfPages(
                             context,
                             b.fileUri.toUri()
-                        )
-                        errorMessage = error
+                        ) { pages, error ->
+
+                            pdfPages = pages
+
+                            pdfContext =
+                                PdfTextExtractor.extractText(
+                                    context,
+                                    b.fileUri.toUri()
+                                )
+
+                            errorMessage = error
+                            isLoading = false
+                        }
+                    }
+
+                    else -> {
+
+                        errorMessage =
+                            "Este libro no tiene vista previa disponible"
+
                         isLoading = false
                     }
-                } else {
-                    errorMessage = "No se encontró una fuente válida para el libro"
-                    isLoading = false
                 }
+
             } ?: run {
+
                 errorMessage = "Libro no encontrado en tu biblioteca"
                 isLoading = false
             }
@@ -170,8 +202,8 @@ fun PdfReaderView(
                     modifier = Modifier.padding(16.dp)
                 )
             } else {
-                // DECISIÓN DE VISOR: Web para Google Books vs Lista de Imágenes para PDF
-                val isGooglePreview = book?.fileUri?.contains("google.com") == true || book?.fileUri?.contains("http") == true
+                val isGooglePreview =
+                    book?.fileUri?.contains("google.com") == true
 
                 if (isGooglePreview) {
                     GoogleBooksWebView(url = book!!.fileUri)
