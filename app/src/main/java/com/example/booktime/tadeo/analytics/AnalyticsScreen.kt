@@ -4,16 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.booktime.tadeo.components.BooktimeBottomNav
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.booktime.tadeo.analytics.AnalyticsViewModel
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun AnalyticsScreen(
     onBottomNavItemSelected: (Int) -> Unit
 ) {
+    val context = LocalContext.current
+    val viewModel: AnalyticsViewModel = viewModel()
 
     Scaffold(
 
@@ -47,14 +53,14 @@ fun AnalyticsScreen(
             ) {
 
                 StatsCard(
-                    title = "Libros leídos",
-                    value = "12",
+                    title = "Guardados",
+                    value = viewModel.totalBooks.value.toString(),
                     emoji = "📚"
                 )
 
                 StatsCard(
                     title = "Favoritos",
-                    value = "3",
+                    value = viewModel.favoriteBooks.value.toString(),
                     emoji = "❤️"
                 )
             }

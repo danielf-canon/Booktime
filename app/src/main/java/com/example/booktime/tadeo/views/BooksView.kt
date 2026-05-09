@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import com.example.booktime.tadeo.R
 import com.example.booktime.tadeo.components.BooktimeBottomNav
 import com.example.booktime.tadeo.data.model.Book
-import com.example.booktime.tadeo.data.repository.GoogleBooksRepository
 import com.example.booktime.tadeo.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 
@@ -44,7 +43,14 @@ fun BooksView(
 
     LaunchedEffect(userId) {
         userId?.let { uid ->
-            books = repository.getUserLibrary(context, uid)
+            books = repository.getUserLibrary(context, uid) { books ->
+
+                totalBooks.value = books.size
+
+                favoriteBooks.value = books.count {
+                    it.isFavorite
+                }
+            }
             isLoading = false
         }
     }

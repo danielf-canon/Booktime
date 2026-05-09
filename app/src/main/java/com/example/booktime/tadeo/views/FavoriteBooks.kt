@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.booktime.tadeo.data.model.Book
 import com.example.booktime.tadeo.data.repository.BookRepository
 import com.example.booktime.tadeo.ui.theme.PrincipalMenu
@@ -34,7 +33,14 @@ fun FavoriteBooksView(
 
     LaunchedEffect(userId) {
         userId?.let { uid ->
-            val library = repository.getUserLibrary(context, uid)
+            val library = repository.getUserLibrary(context, uid) { books ->
+
+                totalBooks.value = books.size
+
+                favoriteBooks.value = books.count {
+                    it.isFavorite
+                }
+            }
             favoriteBooks = library.filter { it.isFavorite }
             isLoading = false
         }

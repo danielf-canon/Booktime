@@ -9,6 +9,9 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 import java.util.UUID
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+
 
 class BookRepository {
     private val gson = Gson()
@@ -49,13 +52,24 @@ class BookRepository {
         }
     }
 
-    suspend fun getUserLibrary(context: Context, userId: String): List<Book> {
+    suspend fun getUserLibrary(
+        context: Context,
+        userId: String
+    ): List<Book> {
+
         return try {
+
             val prefs = getPrefs(context, userId)
-            val existingBooksJson = prefs.getString("library", "[]")
+
+            val existingBooksJson =
+                prefs.getString("library", "[]")
+
             val type = object : TypeToken<List<Book>>() {}.type
+
             gson.fromJson(existingBooksJson, type)
+
         } catch (e: Exception) {
+
             emptyList()
         }
     }
@@ -96,4 +110,31 @@ class BookRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun registerBookOpen(
+        userId: String,
+        bookId: String,
+        title: String
+    ) {
+
+        val db = FirebaseFirestore.getInstance()
+
+        val analyticsData = hashMapOf(
+
+            "bookId" to bookId,
+
+            "title" to title,
+
+            "openedAt" to Timestamp.now()
+        )
+
+        db.collection("users")
+            .document(userId)
+            .collection("analytics")
+            .document("opens")
+            .collection("items")
+            .add(analyticsData)
+            .await()
+    }
+
 }

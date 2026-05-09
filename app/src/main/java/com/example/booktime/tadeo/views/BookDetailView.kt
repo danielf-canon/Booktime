@@ -1,6 +1,5 @@
 package com.example.booktime.tadeo.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,17 +39,11 @@ fun BookDetailView(
     val scope = rememberCoroutineScope()
     val repository = remember { BookRepository() }
     val userId = FirebaseAuth.getInstance().currentUser?.uid
+
     
     var book by remember { mutableStateOf<Book?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(bookId, userId) {
-        if (userId != null) {
-            val library = repository.getUserLibrary(context, userId)
-            book = library.find { it.id == bookId }
-            isLoading = false
-        }
-    }
 
     Scaffold(
         containerColor = PrincipalMenu,
@@ -167,14 +160,35 @@ fun BookDetailView(
 
                 // Botón Leer
                 Button(
-                    onClick = { onReadClick(currentBook.id) },
+                    onClick = {
+
+                        userId?.let { uid ->
+
+                            scope.launch {
+
+                                repository.registerBookOpen(
+                                    userId = uid,
+                                    bookId = currentBook.id,
+                                    title = currentBook.title
+                                )
+
+                                onReadClick(currentBook.id)
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = ButtonGreen)
                 ) {
-                    Text("Leer", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+
+                    Text(
+                        "Leer",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
         }
