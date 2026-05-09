@@ -97,6 +97,7 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose:1.13.1")
     implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
 
 

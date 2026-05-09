@@ -56,6 +56,7 @@ import com.example.booktime.tadeo.ui.theme.PrincipalMenu
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.booktime.tadeo.data.utils.PdfTextExtractor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +73,7 @@ fun PdfReaderView(
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showChat by remember { mutableStateOf(false) }
+    var pdfContext by remember { mutableStateOf("") }
 
     LaunchedEffect(bookId, userId) {
         if (userId != null) {
@@ -86,6 +88,10 @@ fun PdfReaderView(
                 } else if (b.fileUri.isNotEmpty()) {
                     loadPdfPages(context, b.fileUri.toUri()) { pages, error ->
                         pdfPages = pages
+                        pdfContext = PdfTextExtractor.extractText(
+                            context,
+                            b.fileUri.toUri()
+                        )
                         errorMessage = error
                         isLoading = false
                     }
@@ -182,7 +188,12 @@ fun PdfReaderView(
             if (showChat) {
                 ChatBottomSheet(
                     bookTitle = book?.title ?: "Libro",
+                    bookAuthor = book?.author ?: "Autor desconocido",
+                    bookDescription = book?.description ?: "Sin descripción",
+                    pdfContext = pdfContext,
                     onClose = { showChat = false }
+
+                    
                 )
             }
         }
@@ -219,7 +230,7 @@ private suspend fun loadPdfPages(
 ) = withContext(Dispatchers.IO) {
     val bitmaps = mutableListOf<Bitmap>()
     try {
-        // Intentar obtener persistencia de permisos si es un archivo del sistema
+
         try {
             context.contentResolver.takePersistableUriPermission(
                 uri,
@@ -231,11 +242,26 @@ private suspend fun loadPdfPages(
 
         pfd?.use { fd ->
             val renderer = PdfRenderer(fd)
-            for (i in 0 until renderer.pageCount) {
+            val maxPages = minOf(renderer.pageCount, 15)
+
+            for (i in 0 until maxPages) {
                 val page = renderer.openPage(i)
-                // Se aumenta la escala (x2) para mejor legibilidad
-                val bitmap = createBitmap(page.width * 2, page.height * 2)
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                val bitmap = Bitmap.createBitmap(
+                    page.width,
+                    page.height,
+                    Bitmap.Config.ARGB_8888
+                )
+
+                val canvas = android.graphics.Canvas(bitmap)
+                canvas.drawColor(android.graphics.Color.WHITE)
+
+                page.render(
+                    bitmap,
+                    null,
+                    null,
+                    PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+                )
                 bitmaps.add(bitmap)
                 page.close()
             }
