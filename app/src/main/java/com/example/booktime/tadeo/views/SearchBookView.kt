@@ -96,7 +96,7 @@ fun SearchBookView(
                             userId?.let { uid ->
                                 viewModel.saveBookToFirebase(uid) { savedBook ->
                                     val encodedUrl = URLEncoder.encode(savedBook.imageUrl, "UTF-8")
-                                    val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(savedBook.addedAt?.toDate())
+                                    val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(savedBook.addedAt?.toDate() ?: Date())
                                     navController.navigate("${Screen.BookAddedSuccess.route}/${savedBook.title}/${savedBook.author}/$encodedUrl?date=$date")
                                 }
                             }

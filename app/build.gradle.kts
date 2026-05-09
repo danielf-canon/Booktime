@@ -25,8 +25,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
-        resConfigs("es", "en")
+        resourceConfigurations += setOf("es", "en")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -71,16 +70,23 @@ android {
 }
 
 dependencies {
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.database)
-    implementation(libs.coroutines.play.services)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.coroutines.play.services)
+
+    // AndroidX & UI
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -88,20 +94,19 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation)
+
+    // Networking & Images
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.coil.compose)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.ui.graphics)
-    implementation("com.patrykandpatrick.vico:compose:1.13.1")
-    implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Terceros
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
-
-
-
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,3 +115,4 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+

@@ -3,14 +3,13 @@ package com.example.booktime.tadeo.data.repository
 import android.content.Context
 import com.example.booktime.tadeo.data.model.Book
 import com.example.booktime.tadeo.data.model.GoogleBooksResponse
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.delay
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query as ApiQuery
-import com.example.booktime.tadeo.BuildConfig
+
 interface GoogleBooksApi {
     @GET("volumes")
     suspend fun searchBooks(
@@ -22,10 +21,7 @@ interface GoogleBooksApi {
 
 class GoogleBooksRepository {
 
-    private val gson = Gson()
-
-    private fun getPrefs(context: Context, userId: String) =
-        context.getSharedPreferences("books_$userId", Context.MODE_PRIVATE)
+    private val firestore = FirebaseFirestore.getInstance()
 
     private val api = Retrofit.Builder()
         .baseUrl("https://www.googleapis.com/books/v1/")
@@ -37,25 +33,22 @@ class GoogleBooksRepository {
         api.searchBooks(query, apiKey)
 
     suspend fun saveBookToFirebase(context: Context, userId: String, book: Book) {
-        delay(500)
-        val prefs = getPrefs(context, userId)
-        val existingBooksJson = prefs.getString("library", "[]")
-        val type = object : TypeToken<List<Book>>() {}.type
-        val books: MutableList<Book> = gson.fromJson(existingBooksJson, type)
-        
-        // Evitar duplicados por ID
-        if (books.none { it.id == book.id }) {
-            books.add(book)
-            prefs.edit().putString("library", gson.toJson(books)).apply()
+        try {
+            firestore.collection("users").document(userId)
+                .collection("library").document(book.id)
+                .set(book).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     suspend fun getUserLibrary(context: Context, userId: String): List<Book> {
         return try {
-            val prefs = getPrefs(context, userId)
-            val existingBooksJson = prefs.getString("library", "[]")
-            val type = object : TypeToken<List<Book>>() {}.type
-            gson.fromJson(existingBooksJson, type)
+            val snapshot = firestore.collection("users").document(userId)
+                .collection("library")
+                .get().await()
+            
+            snapshot.toObjects(Book::class.java)
         } catch (e: Exception) {
             emptyList()
         }

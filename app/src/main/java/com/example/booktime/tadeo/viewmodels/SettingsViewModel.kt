@@ -10,6 +10,7 @@ import android.util.Log
 import android.content.Context
 import coil.imageLoader
 import androidx.lifecycle.viewModelScope
+import coil.annotation.ExperimentalCoilApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.example.booktime.tadeo.R
@@ -161,6 +162,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         saveSettingsToFirebase()
     }
 
+    @OptIn(ExperimentalCoilApi::class)
     fun clearCache(context: Context) {
         try {
             context.cacheDir.deleteRecursively()

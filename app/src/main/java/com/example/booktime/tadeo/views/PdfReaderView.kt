@@ -58,6 +58,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.example.booktime.tadeo.data.utils.PdfTextExtractor
 
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PdfReaderView(
@@ -81,10 +85,18 @@ fun PdfReaderView(
             book = library.find { it.id == bookId }
 
             book?.let { b ->
-                val isGooglePreview = b.fileUri.contains("google.com") || b.fileUri.contains("http")
+                val isGooglePreview = b.fileUri.contains("books.google.com")
+                val isRemotePdf = b.fileUri.startsWith("http") && (b.fileUri.contains(".pdf") || b.fileUri.contains("firebasestorage"))
 
                 if (isGooglePreview) {
                     isLoading = false
+                } else if (isRemotePdf) {
+                    downloadAndLoadPdf(context, b.fileUri) { pages, text, error ->
+                        pdfPages = pages
+                        pdfContext = text
+                        errorMessage = error
+                        isLoading = false
+                    }
                 } else if (b.fileUri.isNotEmpty()) {
                     loadPdfPages(context, b.fileUri.toUri()) { pages, error ->
                         pdfPages = pages
@@ -221,6 +233,40 @@ fun GoogleBooksWebView(url: String) {
             webView.loadUrl(url)
         }
     )
+}
+
+private suspend fun downloadAndLoadPdf(
+    context: android.content.Context,
+    url: String,
+    onResult: (List<Bitmap>, String, String?) -> Unit
+) = withContext(Dispatchers.IO) {
+    try {
+        val file = File(context.cacheDir, "temp_reading_book.pdf")
+        URL(url).openStream().use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+        
+        val uri = Uri.fromFile(file)
+        var text = ""
+        var pagesList = emptyList<Bitmap>()
+        
+        loadPdfPages(context, uri) { pages, error ->
+            if (error == null) {
+                pagesList = pages
+                text = PdfTextExtractor.extractText(context, uri)
+            }
+        }
+        
+        withContext(Dispatchers.Main) {
+            onResult(pagesList, text, null)
+        }
+    } catch (e: Exception) {
+        withContext(Dispatchers.Main) {
+            onResult(emptyList(), "", "Error al descargar el libro: ${e.localizedMessage}")
+        }
+    }
 }
 
 private suspend fun loadPdfPages(
