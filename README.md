@@ -1,118 +1,103 @@
-# 📚 Booktime App
+📚 Booktime AI
+Aplicación Android desarrollada con Jetpack Compose que integra inteligencia artificial con Gemini para mejorar la experiencia de lectura de libros PDF.
 
-Aplicación Android desarrollada con Jetpack Compose que permite a los usuarios registrarse, iniciar sesión y gestionar sus preferencias de lectura.
+La aplicación permite:
 
----
+Leer PDFs dentro de la app
+Chatear con una IA contextual
+Obtener resúmenes y análisis
+Guardar historial de conversaciones
+Extraer texto del PDF automáticamente
+Responder usando contexto real del libro
+🚀 Tecnologías utilizadas
+Frontend
+Kotlin
+Jetpack Compose
+Material 3
+Backend / Servicios
+Firebase Firestore
+Firebase Authentication
+Gemini API
+IA
+Prompt Engineering
+Context Injection
+Mini-RAG básico
+PDFs
+PdfRenderer
+PDFBox Android
+🧠 Funcionamiento de la IA
+La IA utiliza Gemini API para generar respuestas relacionadas con el libro que el usuario está leyendo.
 
-## 🚀 Requisitos
+El sistema:
 
-Antes de comenzar, asegúrate de tener instalado:
+Extrae texto del PDF
+Busca fragmentos relevantes según la pregunta del usuario
+Envía contexto específico a Gemini
+Genera respuestas contextualizadas
+Esto permite respuestas más precisas y evita respuestas genéricas.
 
-* Android Studio (última versión recomendada)
-* JDK 17 o superior
-* Gradle (incluido en Android Studio)
-* Cuenta de Firebase
+📄 Funcionalidades principales
+✅ Lector PDF
+Renderizado de páginas
+Scroll vertical
+Carga optimizada de páginas
+✅ Chat IA
+Preguntas personalizadas
+Resumen automático
+Explicación de personajes
+Temas principales
+✅ Historial persistente
+Conversaciones guardadas en Firebase
+Recuperación automática del historial
+✅ Mini-RAG
+Búsqueda básica de fragmentos relevantes
+Contexto dinámico según la pregunta
+✅ UI moderna
+Diseño dark mode
+Burbujas de chat
+Auto scroll
+Componentes Material 3
+🔥 Arquitectura general
+ChatBottomSheet
+Maneja:
 
----
+interfaz del chat
+prompts IA
+envío de mensajes
+renderizado visual
+GeminiRepository
+Encargado de:
 
-## 📥 Clonar el repositorio
+conexión con Gemini API
+requests HTTP usando Retrofit
+manejo de respuestas
+ChatRepository
+Encargado de:
 
-```bash
-git clone https://github.com/danielf-canon/Booktime.git
-cd Booktime
-```
+guardar chats en Firestore
+recuperar historial
+PdfTextExtractor
+Extrae texto del PDF usando PDFBox.
 
----
+PdfContextHelper
+Busca fragmentos relevantes del PDF para mejorar el contexto enviado a la IA.
 
-## 🔥 Configuración de Firebase
+⚡ Manejo de errores
+La aplicación incluye:
 
-⚠️ **Este paso es obligatorio para que la app funcione correctamente.**
-
-1. Ve a Firebase Console
-2. Crea un proyecto (o usa uno existente)
-3. Agrega una app Android con el mismo `applicationId` del proyecto
-4. Descarga el archivo:
-
-```
-google-services.json
-```
-
-5. Coloca ese archivo en:
-
-```
-app/google-services.json
-```
-
----
-
-## ⚙️ Abrir el proyecto
-
-1. Abre Android Studio
-2. Selecciona **"Open Project"**
-3. Elige la carpeta del repositorio
-
----
-
-## 🛠️ Build del proyecto
-
-Una vez abierto:
-
-* Espera a que Gradle sincronice automáticamente
-* Si no lo hace, ejecuta:
-
-```
-Build > Make Project
-```
-
----
-
-## ▶️ Ejecutar la aplicación
-
-1. Conecta un dispositivo Android o inicia un emulador
-2. Presiona:
-
-```
-Run ▶
-```
-
-o usa:
-
-```
-Shift + F10
-```
-
----
-
-## 🔐 Funcionalidades principales
-
-* Registro de usuario con Firebase Authentication
-* Inicio de sesión
-* Recuperación de contraseña 
-* Flujo de onboarding
-* Navegación con animaciones
-
----
-
-## ⚠️ Notas importantes
-
-* El archivo `google-services.json` no está incluido por seguridad
-* Asegúrate de habilitar en Firebase:
-
-```
-Authentication → Sign-in method → Email/Password
-```
-
----
-
-## 👨‍💻 Tecnologías usadas
-
-* Kotlin
-* Jetpack Compose
-* Firebase Authentication
-* Android SDK
-
----
-
-## 📌 Estado del proyecto
-
-🚧 En desarrollo — funcionalidades principales implementadas
+control de peticiones repetidas
+manejo de errores de red
+validación de contexto
+limitación de spam
+respuestas fuera de contexto
+📌 Posibles mejoras futuras
+Streaming de respuestas IA
+Embeddings reales
+RAG avanzado
+OCR para PDFs escaneados
+Búsqueda semántica
+Sincronización multiusuario
+Sistema de favoritos
+Modo offline con IA local
+👨‍💻 Autor
+Proyecto desarrollado como aplicación de lectura inteligente con integración de inteligencia artificial contextual.
